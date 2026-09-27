@@ -184,7 +184,7 @@
       .panel-title{font-size:19px}.metric .value{font-size:23px}
       .city-badge{min-width:132px;max-width:158px;min-height:29px;padding:5px 8px}
       .city-badge .city-name{font-size:8.6px}.city-badge .city-price{font-size:9.2px}
-      .region-pin{padding:8px 12px}.region-pin strong{font-size:10.5px}
+      .region-pin{padding:7px 10px}.region-pin strong{font-size:9.8px}
       .location-badge{min-height:29px;font-size:8.6px}
       .leaflet-control-attribution{font-size:8px!important}
     }
@@ -289,6 +289,20 @@
   
     /* Calmer premium basemap treatment for the SLS website */
     .leaflet-tile-pane{filter:grayscale(.72) saturate(.38) brightness(1.12) contrast(.82) sepia(.10);opacity:.88}
+
+
+    /* Compact regional navigation on the Google basemap */
+    .region-pin{
+      min-width:108px!important;
+      padding:7px 10px!important;
+      border-width:1.5px!important;
+      box-shadow:0 8px 20px rgba(11,17,18,.13)!important;
+    }
+    .region-pin strong{font-size:10px!important;letter-spacing:-.01em}
+    @media(max-width:760px){
+      .region-pin{min-width:104px!important;padding:7px 9px!important}
+      .region-pin strong{font-size:9.7px!important}
+    }
 
 </style>
 </head>
@@ -430,10 +444,10 @@ const detailMarkets={
 };
 const NRW_BOUNDS=L.latLngBounds([[50.35,5.90],[52.45,9.25]]);
 const regions=[
-  {name:'Ruhrgebiet',lat:51.52,lon:7.10,zoom:9.30,cities:['Dorsten','Recklinghausen','Essen','Bochum','Dortmund','Herne','Schermbeck']},
-  {name:'Rheinland',lat:51.05,lon:6.78,zoom:9.35,cities:['Düsseldorf','Leverkusen']},
-  {name:'Niederrhein',lat:51.48,lon:6.20,zoom:9.45,cities:['Nettetal']},
-  {name:'Münsterland',lat:51.95,lon:7.60,zoom:9.45,cities:['Ascheberg']}
+  {name:'Ruhrgebiet',lat:51.52,lon:7.10,zoom:9.60,cities:['Dorsten','Recklinghausen','Essen','Bochum','Dortmund','Herne','Schermbeck']},
+  {name:'Rheinland',lat:51.05,lon:6.78,zoom:9.70,cities:['Düsseldorf','Leverkusen']},
+  {name:'Niederrhein',lat:51.48,lon:6.20,zoom:9.70,cities:['Nettetal']},
+  {name:'Münsterland',lat:51.95,lon:7.60,zoom:9.65,cities:['Ascheberg']}
 ];
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 const GOOGLE_MAPS_BROWSER_KEY='__GOOGLE_MAPS_BROWSER_KEY__';
@@ -470,6 +484,7 @@ function loadGoogleBasemap(){
       googleLayer.on('tileerror',()=>{});
       map.removeLayer(baseLayer);
       baseLayer=googleLayer.addTo(map);
+      if(map.attributionControl) map.attributionControl.remove();
       setTimeout(()=>map.invalidateSize(false),100);
     }catch(e){
       console.warn('Google basemap init failed; keeping OSM fallback.');
@@ -618,7 +633,7 @@ function markerIcon(d,cityMode){
   return L.divIcon({className:'',html:'<div class="district-badge"><span class="district-name">'+d.name+'</span><span class="district-price">'+label+' €</span></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]})
 }
 function regionIcon(r){
-  const size=[124,36];
+  const size=[108,32];
   return L.divIcon({className:'',html:'<div class="region-pin"><strong>'+r.name+'</strong></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]})
 }
 function addRegions(){
@@ -776,7 +791,7 @@ function syncMapSize(){
 }
 function setInitialView(){
   if(window.matchMedia('(max-width:760px)').matches){
-    map.setView([51.54,6.98],7.72,{animate:false});
+    map.setView([51.48,7.08],7.90,{animate:false});
   }else{
     map.fitBounds(NRW_BOUNDS,{padding:[24,24],animate:false});
   }
