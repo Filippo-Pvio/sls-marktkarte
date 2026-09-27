@@ -127,18 +127,63 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 const cities=[
-{name:'Dorsten',plz:'46282',lat:51.660,lon:6.965,wohnung:[2350,2950],haus:[2550,3350],typW:2650,typH:2940},
-{name:'Recklinghausen',plz:'45657',lat:51.614,lon:7.197,wohnung:[2400,3150],haus:[2650,3500],typW:2780,typH:3060},
-{name:'Essen',plz:'45127',lat:51.456,lon:7.012,wohnung:[2600,3650],haus:[3000,4300],typW:3120,typH:3680},
-{name:'Bochum',plz:'44787',lat:51.481,lon:7.216,wohnung:[2450,3450],haus:[2850,4050],typW:2950,typH:3440},
-{name:'Dortmund',plz:'44135',lat:51.514,lon:7.466,wohnung:[2500,3600],haus:[2900,4200],typW:3050,typH:3560},
-{name:'Düsseldorf',plz:'40213',lat:51.227,lon:6.774,wohnung:[4200,6500],haus:[4700,7200],typW:5230,typH:5940},
-{name:'Leverkusen',plz:'51373',lat:51.045,lon:7.019,wohnung:[3100,4300],haus:[3550,4950],typW:3670,typH:4190},
-{name:'Nettetal',plz:'41334',lat:51.317,lon:6.279,wohnung:[2200,3100],haus:[2650,3800],typW:2620,typH:3180},
-{name:'Ascheberg',plz:'59387',lat:51.789,lon:7.620,wohnung:[2350,3200],haus:[2800,3900],typW:2740,typH:3310},
-{name:'Herne',plz:'44623',lat:51.538,lon:7.225,wohnung:[2100,2900],haus:[2450,3400],typW:2480,typH:2860},
-{name:'Schermbeck',plz:'46514',lat:51.694,lon:6.875,wohnung:[2450,3250],haus:[2900,4100],typW:2810,typH:3470}
+{name:'Dorsten',plz:'46282',lat:51.660,lon:6.965,wohnung:[2350,2950],haus:[2550,3350],typW:2650,typH:2940,marketScope:'city'},
+{name:'Recklinghausen',plz:'45657',lat:51.614,lon:7.197,wohnung:[2400,3150],haus:[2650,3500],typW:2780,typH:3060,marketScope:'city'},
+{name:'Essen',plz:'45127',lat:51.456,lon:7.012,wohnung:[2600,3650],haus:[3000,4300],typW:3120,typH:3680,marketScope:'city'},
+{name:'Bochum',plz:'44787',lat:51.481,lon:7.216,wohnung:[2450,3450],haus:[2850,4050],typW:2950,typH:3440,marketScope:'city'},
+{name:'Dortmund',plz:'44135',lat:51.514,lon:7.466,wohnung:[2500,3600],haus:[2900,4200],typW:3050,typH:3560,marketScope:'city'},
+{name:'Düsseldorf',plz:'40213',lat:51.227,lon:6.774,wohnung:[4200,6500],haus:[4700,7200],typW:5230,typH:5940,marketScope:'city'},
+{name:'Leverkusen',plz:'51373',lat:51.045,lon:7.019,wohnung:[3100,4300],haus:[3550,4950],typW:3670,typH:4190,marketScope:'city'},
+{name:'Nettetal',plz:'41334',lat:51.317,lon:6.279,wohnung:[2200,3100],haus:[2650,3800],typW:2620,typH:3180,marketScope:'city'},
+{name:'Ascheberg',plz:'59387',lat:51.789,lon:7.620,wohnung:[2350,3200],haus:[2800,3900],typW:2740,typH:3310,marketScope:'city'},
+{name:'Herne',plz:'44623',lat:51.538,lon:7.225,wohnung:[2100,2900],haus:[2450,3400],typW:2480,typH:2860,marketScope:'city'},
+{name:'Schermbeck',plz:'46514',lat:51.694,lon:6.875,wohnung:[2450,3250],haus:[2900,4100],typW:2810,typH:3470,marketScope:'city'}
 ];
+const cityOfferSnapshot={
+  'Dorsten':{
+    wohnung:{range:[1600,3400],typ:2100,n:20},
+    haus:{range:[1950,3100],typ:2500,n:20}
+  },
+  'Recklinghausen':{
+    wohnung:{range:[1600,3500],typ:2200,n:20},
+    haus:{range:[2700,3850],typ:3250,n:19}
+  },
+  'Essen':{
+    wohnung:{range:[3050,5400],typ:4250,n:20},
+    haus:{range:[3350,5600],typ:4800,n:17}
+  },
+  'Bochum':{
+    wohnung:{range:[2800,4700],typ:3600,n:20},
+    haus:{range:[3550,4500],typ:4050,n:20}
+  },
+  'Dortmund':{
+    wohnung:{range:[2350,4000],typ:2700,n:20},
+    haus:{range:[3150,4350],typ:4050,n:20}
+  },
+  'Herne':{
+    wohnung:{range:[1450,2050],typ:1700,n:19},
+    haus:{range:[1700,3550],typ:2450,n:19}
+  },
+  'Schermbeck':{
+    wohnung:{range:[2350,2850],typ:2700,n:5},
+    haus:{range:[2200,3400],typ:2800,n:20}
+  },
+  'Düsseldorf':{
+    wohnung:{range:[8800,9300],typ:8900,n:20},
+    haus:{range:[5000,9150],typ:6150,n:19}
+  },
+  'Leverkusen':{
+    wohnung:{range:[2500,3650],typ:2950,n:19},
+    haus:{range:[3700,4350],typ:4150,n:18}
+  },
+  'Nettetal':{
+    wohnung:{range:[1950,2550],typ:2000,n:13},
+    haus:{range:[2700,3400],typ:3100,n:16}
+  },
+  'Ascheberg':{
+    haus:{range:[2600,4000],typ:3250,n:16}
+  }
+};
 const offerSnapshot={
   '46282':{
     haus:{range:[1850,3250],typ:2700,n:11},
@@ -209,7 +254,10 @@ map.zoomControl.setPosition('bottomleft');
 let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,activeLocation=null,renderLevel='region',searchExpandedByUser=false,viewportSeq=0,viewportTimer=0;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 function sourceDatum(d){
-  if(dataSource==='snapshot') return offerSnapshot[String(d.plz||'')]?.[currentType]||null;
+  if(dataSource==='snapshot'){
+    if(d?.marketScope==='city') return cityOfferSnapshot[String(d.name||'')]?.[currentType]||null;
+    return offerSnapshot[String(d.plz||'')]?.[currentType]||null;
+  }
   if(dataSource==='sls') return slsDatum(d);
   return null;
 }
@@ -395,7 +443,7 @@ function openPanel(d,kicker){
   if(dataSource==='snapshot'&&s){
     const level=s.n>=10?'gute Datenbasis':s.n>=5?'eingeschränkte Datenbasis':'zu geringe Datenbasis';
     q.innerHTML='<b>Datenbasis:</b> '+s.n+' passende Vergleichsangebote · '+level+'.';
-    fine.textContent='Angebotsindikation · Stand September 2026 · kein Verkehrswert. Einzelangebote werden hier nicht veröffentlicht.';
+    fine.textContent=(d.marketScope==='city'?'Stadtweite Angebotsindikation':'PLZ-genaue Angebotsindikation')+' · Stand September 2026 · kein Verkehrswert. Einzelangebote werden hier nicht veröffentlicht.';
   }else if(dataSource==='sls'&&s){
     const basis=s.basis==='sold'?'realisierte SLS-Verkaufspreise':'anonymisierte SLS-Angebots-/Vermarktungsdaten';
     q.innerHTML='<b>SLS Daten:</b> '+s.count+' nutzbare Fälle · '+basis+'.';
