@@ -34,6 +34,16 @@
     .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:650;padding:9px 12px;border-radius:999px;cursor:pointer;transition:.18s ease;white-space:nowrap}
     .seg button.active{background:white;color:var(--brand-dark);box-shadow:0 2px 12px rgba(25,50,56,.10)}
     .main{position:relative;min-width:0;min-height:0;width:100%;height:100%;overflow:hidden}#map{position:absolute;inset:0;width:100%!important;height:100%!important;min-width:100%;min-height:100%;background:#dfe9e7}.leaflet-container{width:100%!important;height:100%!important;overflow:hidden!important}
+    .map-tools{position:absolute;z-index:760;left:24px;top:24px;display:flex;flex-direction:column;gap:8px;width:min(420px,calc(100vw - 48px))}
+    .search-wrap{position:relative;background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.9);border-radius:16px;box-shadow:0 10px 28px rgba(25,50,56,.13);display:flex;align-items:center;padding:0 12px}
+    .search-wrap svg{width:18px;height:18px;flex:0 0 auto;color:var(--brand)}
+    .search-input{width:100%;border:0;outline:0;background:transparent;padding:12px 8px;font:inherit;font-size:13px;color:var(--ink)}
+    .search-input::placeholder{color:#879699}
+    .search-results{display:none;background:white;border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+    .search-results.open{display:block}.search-result{width:100%;border:0;border-bottom:1px solid var(--line);background:white;text-align:left;padding:11px 13px;font:inherit;cursor:pointer}.search-result:last-child{border-bottom:0}
+    .search-result strong{display:block;font-size:12px}.search-result span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+    .crumbs{display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:rgba(255,255,255,.94);border-radius:999px;padding:6px 9px;width:max-content;max-width:100%;box-shadow:0 8px 22px rgba(25,50,56,.12)}
+    .crumbs button{border:0;background:transparent;color:var(--brand);font:inherit;font-size:10px;font-weight:800;padding:3px 4px;cursor:pointer}.crumbs i{font-style:normal;color:#9aa7a9;font-size:9px}.crumbs .current{color:var(--ink)}
     .intro-card{position:absolute;z-index:600;left:24px;top:24px;width:min(420px,calc(100vw - 48px));background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
     .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
     h1{font-size:26px;line-height:1.08;letter-spacing:-.045em;margin:0 0 9px}.intro-card p{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0}
@@ -63,9 +73,8 @@
     .quality{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.45}.quality b{color:var(--ink)}
     .cta{margin-top:16px;width:100%;border:0;border-radius:14px;padding:13px 16px;background:var(--brand);color:white;font:inherit;font-weight:800;cursor:pointer}
     .fine{margin-top:9px;font-size:10.5px;color:#809094;line-height:1.35}
-    .price-pin{position:relative;transform:translate(-50%,-100%);background:var(--brand);color:#fff;border:3px solid #fff;border-radius:12px;padding:8px 10px;box-shadow:0 9px 24px rgba(14,91,98,.28);font-weight:800;white-space:nowrap;font-size:13px;line-height:1}
-    .price-pin::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:var(--brand);border-right:3px solid #fff;border-bottom:3px solid #fff}
-    .price-pin small{display:block;font-size:9px;font-weight:650;opacity:.8;margin-bottom:3px}.price-pin.city{background:#fff;color:var(--brand-dark);border-color:var(--brand);padding:9px 12px}.price-pin.city::after{background:white;border-color:var(--brand)}
+    .district-badge{display:flex;align-items:center;gap:6px;width:154px;min-height:31px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 9px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
+    .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:750;opacity:.82}.district-badge .district-price{margin-left:auto;white-space:nowrap;font-size:10px;font-weight:850}
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
     @media(max-width:760px){
       header{flex:0 0 auto}
@@ -75,6 +84,7 @@
       .filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:0 0 1px;scrollbar-width:none}
       .filters::-webkit-scrollbar{display:none}.seg{padding:3px}.seg button{padding:7px 9px;font-size:10.5px}
       .main{height:100%;min-height:0;overflow:hidden}
+      .map-tools{left:10px;top:58px;width:min(330px,calc(100vw - 20px));gap:6px}.search-wrap{border-radius:13px}.search-input{padding:9px 6px;font-size:11px}.search-wrap svg{width:15px;height:15px}.crumbs{padding:5px 7px}.crumbs button{font-size:9px}
       .intro-card{left:10px;top:10px;width:min(320px,calc(100vw - 20px));padding:12px 40px 12px 13px;border-radius:15px;box-shadow:0 10px 28px rgba(25,50,56,.13)}
       .intro-card.compact{max-width:220px;padding:9px 36px 9px 11px}.intro-toggle{right:7px;top:7px;width:25px;height:25px;font-size:13px}
       .eyebrow{font-size:9px;margin-bottom:5px}.intro-card h1{font-size:17px;line-height:1.08;margin-bottom:6px}.intro-card p{font-size:10.5px;line-height:1.35}
@@ -86,6 +96,7 @@
       .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
       .region-pin{padding:9px 13px}.region-pin strong{font-size:11.5px}
       .city-badge{width:164px;min-height:32px;padding:6px 9px;gap:6px}.city-badge .city-name{font-size:9px}.city-badge .city-price{font-size:10px}
+      .district-badge{width:146px;min-height:30px;padding:6px 8px}.district-badge .district-name{font-size:8.5px}.district-badge .district-price{font-size:9.5px}
     }
   </style>
 </head>
@@ -94,6 +105,14 @@
   <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
+    <div class="map-tools">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="marketSearch" class="search-input" autocomplete="off" inputmode="search" placeholder="Stadt oder PLZ suchen" aria-label="Stadt oder PLZ suchen">
+      </div>
+      <div id="searchResults" class="search-results"></div>
+      <nav id="crumbs" class="crumbs" aria-label="Kartennavigation"></nav>
+    </div>
     <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Starten Sie mit einer Region, zoomen Sie in eine Stadt und anschließend in den passenden Teilmarkt.</p><div class="legend"><i></i><span>Für den Prototyp verwenden wir bewusst gekennzeichnete Demo-Werte.</span></div></section>
     <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality"><b>Datenqualität im späteren Live-Betrieb:</b> externe Marktdaten + regionale Vergleichsdaten + SLS-Transaktionsdaten, gewichtet nach Datenmenge und Aktualität.</div><button class="cta" id="cta">Was ist meine Immobilie wert?</button><div class="fine">Prototyp: Werte dienen nur der UI-/Funktionsprüfung und dürfen nicht als Marktwerte veröffentlicht werden.</div></div></aside>
     <div class="demo"><strong>TESTVERSION</strong>Keine Veröffentlichung auf sls.de</div>
@@ -102,17 +121,17 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 const cities=[
-{name:'Dorsten',lat:51.660,lon:6.965,wohnung:[2350,2950],haus:[2550,3350],typW:2650,typH:2940},
-{name:'Recklinghausen',lat:51.614,lon:7.197,wohnung:[2400,3150],haus:[2650,3500],typW:2780,typH:3060},
-{name:'Essen',lat:51.456,lon:7.012,wohnung:[2600,3650],haus:[3000,4300],typW:3120,typH:3680},
-{name:'Bochum',lat:51.481,lon:7.216,wohnung:[2450,3450],haus:[2850,4050],typW:2950,typH:3440},
-{name:'Dortmund',lat:51.514,lon:7.466,wohnung:[2500,3600],haus:[2900,4200],typW:3050,typH:3560},
-{name:'Düsseldorf',lat:51.227,lon:6.774,wohnung:[4200,6500],haus:[4700,7200],typW:5230,typH:5940},
-{name:'Leverkusen',lat:51.045,lon:7.019,wohnung:[3100,4300],haus:[3550,4950],typW:3670,typH:4190},
-{name:'Nettetal',lat:51.317,lon:6.279,wohnung:[2200,3100],haus:[2650,3800],typW:2620,typH:3180},
-{name:'Ascheberg',lat:51.789,lon:7.620,wohnung:[2350,3200],haus:[2800,3900],typW:2740,typH:3310},
-{name:'Herne',lat:51.538,lon:7.225,wohnung:[2100,2900],haus:[2450,3400],typW:2480,typH:2860},
-{name:'Schermbeck',lat:51.694,lon:6.875,wohnung:[2450,3250],haus:[2900,4100],typW:2810,typH:3470}
+{name:'Dorsten',plz:'46282',lat:51.660,lon:6.965,wohnung:[2350,2950],haus:[2550,3350],typW:2650,typH:2940},
+{name:'Recklinghausen',plz:'45657',lat:51.614,lon:7.197,wohnung:[2400,3150],haus:[2650,3500],typW:2780,typH:3060},
+{name:'Essen',plz:'45127',lat:51.456,lon:7.012,wohnung:[2600,3650],haus:[3000,4300],typW:3120,typH:3680},
+{name:'Bochum',plz:'44787',lat:51.481,lon:7.216,wohnung:[2450,3450],haus:[2850,4050],typW:2950,typH:3440},
+{name:'Dortmund',plz:'44135',lat:51.514,lon:7.466,wohnung:[2500,3600],haus:[2900,4200],typW:3050,typH:3560},
+{name:'Düsseldorf',plz:'40213',lat:51.227,lon:6.774,wohnung:[4200,6500],haus:[4700,7200],typW:5230,typH:5940},
+{name:'Leverkusen',plz:'51373',lat:51.045,lon:7.019,wohnung:[3100,4300],haus:[3550,4950],typW:3670,typH:4190},
+{name:'Nettetal',plz:'41334',lat:51.317,lon:6.279,wohnung:[2200,3100],haus:[2650,3800],typW:2620,typH:3180},
+{name:'Ascheberg',plz:'59387',lat:51.789,lon:7.620,wohnung:[2350,3200],haus:[2800,3900],typW:2740,typH:3310},
+{name:'Herne',plz:'44623',lat:51.538,lon:7.225,wohnung:[2100,2900],haus:[2450,3400],typW:2480,typH:2860},
+{name:'Schermbeck',plz:'46514',lat:51.694,lon:6.875,wohnung:[2450,3250],haus:[2900,4100],typW:2810,typH:3470}
 ];
 const detailMarkets={
 'Dorsten':[{name:'Wulfen',lat:51.720,lon:7.020,wohnung:[2300,2850],haus:[2600,3400],typW:2570,typH:2980},{name:'Hervest',lat:51.683,lon:6.983,wohnung:[2150,2700],haus:[2500,3250],typW:2440,typH:2860},{name:'Holsterhausen',lat:51.674,lon:6.944,wohnung:[2350,2950],haus:[2700,3500],typW:2640,typH:3060},{name:'Altstadt',lat:51.661,lon:6.965,wohnung:[2550,3200],haus:[2850,3700],typW:2870,typH:3260},{name:'Rhade',lat:51.754,lon:6.944,wohnung:[2250,2800],haus:[2650,3500],typW:2510,typH:3050}],
@@ -131,7 +150,7 @@ const regions=[
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
-let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,renderLevel='region';
+let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region';
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 const priceText=d=>currentMode==='spanne'?new Intl.NumberFormat('de-DE').format(d[currentType][0])+'–'+new Intl.NumberFormat('de-DE').format(d[currentType][1])+' €/m²':fmt(currentType==='wohnung'?d.typW:d.typH);
 const typical=d=>fmt(currentType==='wohnung'?d.typW:d.typH);
@@ -165,17 +184,18 @@ function markerIcon(d,cityMode){
     const size=[176,34];
     return L.divIcon({className:'',html:'<div class="city-badge"><span class="dot"></span><span class="city-name">'+d.name+'</span><span class="city-price">'+label+' €</span></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]});
   }
-  return L.divIcon({className:'',html:'<div class="price-pin"><small>'+d.name+'</small>'+label+' €</div>',iconSize:[0,0],iconAnchor:[0,0]})
+  const size=[154,31];
+  return L.divIcon({className:'',html:'<div class="district-badge"><span class="district-name">'+d.name+'</span><span class="district-price">'+label+' €</span></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]})
 }
 function regionIcon(r){
   const size=[124,36];
   return L.divIcon({className:'',html:'<div class="region-pin"><strong>'+r.name+'</strong></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]})
 }
 function addRegions(){
-  clearMarkers();renderLevel='region';
+  clearMarkers();renderLevel='region';activeCity=null;
   regions.forEach(r=>{
     const m=L.marker([r.lat,r.lon],{icon:regionIcon(r)}).addTo(map);
-    m.on('click',()=>{activeRegion=r;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.7});setTimeout(renderForView,650)});
+    m.on('click',()=>{activeRegion=r;activeCity=null;updateCrumbs();document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.7});setTimeout(renderForView,650)});
     markers.push(m)
   });
   clampAllMarkers();
@@ -193,8 +213,14 @@ function addData(data,cityMode=false){
   shown.forEach(d=>{
     const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,cityMode),riseOnHover:true}).addTo(map);
     m.on('click',()=>{
-      if(cityMode&&detailMarkets[d.name]){map.flyTo([d.lat,d.lon],12,{duration:.8});setTimeout(()=>addData(detailMarkets[d.name],false),700)}
-      openPanel(d,cityMode?'Marktregion':'Teilmarkt')
+      if(cityMode){
+        activeCity=d;
+        activeRegion=regions.find(r=>r.cities.includes(d.name))||activeRegion;
+        updateCrumbs();
+        map.flyTo([d.lat,d.lon],detailMarkets[d.name]?12:11.4,{duration:.8});
+        if(detailMarkets[d.name]) setTimeout(()=>addData(detailMarkets[d.name],false),700);
+      }
+      openPanel(d,cityMode?'Stadt':'Teilmarkt')
     });
     markers.push(m)
   });
@@ -205,19 +231,46 @@ function nearestRegion(){const center=map.getCenter();return regions.slice().sor
 function nearestCity(){const center=map.getCenter();return cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
 function renderForView(){
   const z=map.getZoom();
-  if(z<8.8){activeRegion=null;addRegions();return}
+  if(z<8.8){activeRegion=null;activeCity=null;addRegions();updateCrumbs();return}
   if(z<10.8){
     const r=activeRegion||nearestRegion();
-    activeRegion=r;
-    addData(cities.filter(c=>r.cities.includes(c.name)),true);
+    activeRegion=r;activeCity=null;
+    addData(cities.filter(c=>r.cities.includes(c.name)),true);updateCrumbs();
     return
   }
-  const city=nearestCity();
+  const city=activeCity||nearestCity();
+  activeCity=city;
+  activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;
   if(detailMarkets[city.name]) addData(detailMarkets[city.name],false);
   else addData([city],true);
+  updateCrumbs();
 }
 function update(){renderForView()}
-addRegions();
+function goNRW(){activeRegion=null;activeCity=null;document.getElementById('panel').classList.remove('open');setInitialView();setTimeout(renderForView,80)}
+function goRegion(r){activeRegion=r;activeCity=null;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.65});setTimeout(renderForView,600)}
+function goCity(city){activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],detailMarkets[city.name]?12:11.4,{duration:.7});setTimeout(renderForView,650)}
+function updateCrumbs(){
+  const el=document.getElementById('crumbs');
+  let html='<button data-nav="nrw">NRW</button>';
+  if(activeRegion) html+='<i>›</i><button data-nav="region">'+activeRegion.name+'</button>';
+  if(activeCity) html+='<i>›</i><button class="current" data-nav="city">'+activeCity.name+'</button>';
+  el.innerHTML=html;
+  el.querySelector('[data-nav="nrw"]').onclick=goNRW;
+  const rb=el.querySelector('[data-nav="region"]');if(rb) rb.onclick=()=>goRegion(activeRegion);
+  const cb=el.querySelector('[data-nav="city"]');if(cb) cb.onclick=()=>goCity(activeCity);
+}
+const marketSearch=document.getElementById('marketSearch'),searchResults=document.getElementById('searchResults');
+function runSearch(){
+  const q=marketSearch.value.trim().toLowerCase();
+  if(!q){searchResults.classList.remove('open');searchResults.innerHTML='';return}
+  const matches=cities.filter(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q)).slice(0,6);
+  searchResults.innerHTML=matches.length?matches.map((c,i)=>'<button class="search-result" data-i="'+i+'"><strong>'+c.name+'</strong><span>'+c.plz+' · Nordrhein-Westfalen</span></button>').join(''):'<button class="search-result" disabled><strong>Noch kein Treffer</strong><span>Die Suche wird später auf ganz NRW erweitert.</span></button>';
+  searchResults.classList.add('open');
+  matches.forEach((city,i)=>{const b=searchResults.querySelector('[data-i="'+i+'"]');if(b)b.onclick=()=>{marketSearch.value=city.name;searchResults.classList.remove('open');goCity(city)}})
+}
+marketSearch.addEventListener('input',runSearch);
+marketSearch.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=marketSearch.value.trim().toLowerCase();const city=cities.find(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q));if(city){searchResults.classList.remove('open');goCity(city)}}});
+addRegions();updateCrumbs();
 
 function syncMapSize(){
   requestAnimationFrame(()=>{
