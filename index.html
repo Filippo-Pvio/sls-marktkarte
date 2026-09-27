@@ -281,18 +281,53 @@ function updateCrumbs(){
   const cb=el.querySelector('[data-nav="city"]');if(cb) cb.onclick=()=>goCity(activeCity);
 }
 const marketSearch=document.getElementById('marketSearch'),searchResults=document.getElementById('searchResults'),mapTools=document.querySelector('.map-tools');
-function runSearch(){
+let remoteSearchTimer=0,remoteSearchSeq=0;
+async function chooseRemoteLocation(x){
+  marketSearch.value=[x.postalCode,x.name||x.municipality].filter(Boolean).join(' · ');
+  searchResults.classList.remove('open');
+  try{
+    const r=await fetch('/api/geocode-location?postalCode='+encodeURIComponent(x.postalCode)+'&name='+encodeURIComponent(x.name||x.municipality||''));
+    const d=await r.json();
+    if(d.found){
+      activeCity=null;activeRegion=null;searchExpandedByUser=false;
+      map.flyTo([d.lat,d.lon],12,{duration:.7});
+      setTimeout(renderForView,650);
+      updateCrumbs();
+    }
+  }catch(e){}
+}
+async function runSearch(){
   const q=marketSearch.value.trim().toLowerCase();
   if(!q){searchResults.classList.remove('open');searchResults.innerHTML='';return}
-  const matches=cities.filter(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q)).slice(0,6);
-  searchResults.innerHTML=matches.length?matches.map((c,i)=>'<button class="search-result" data-i="'+i+'"><strong>'+c.name+'</strong><span>'+c.plz+' · Nordrhein-Westfalen</span></button>').join(''):'<button class="search-result" disabled><strong>Noch kein Treffer</strong><span>Die Suche wird später auf ganz NRW erweitert.</span></button>';
-  searchResults.classList.add('open');
-  matches.forEach((city,i)=>{const b=searchResults.querySelector('[data-i="'+i+'"]');if(b)b.onclick=()=>{marketSearch.value=city.name;searchResults.classList.remove('open');goCity(city)}})
+  const local=cities.filter(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q)).slice(0,6);
+  if(local.length){
+    searchResults.innerHTML=local.map((city,i)=>'<button class="search-result" data-local="'+i+'"><strong>'+city.name+'</strong><span>'+city.plz+' · Nordrhein-Westfalen</span></button>').join('');
+    searchResults.classList.add('open');
+    local.forEach((city,i)=>{const b=searchResults.querySelector('[data-local="'+i+'"]');if(b)b.onclick=()=>{marketSearch.value=city.name;searchResults.classList.remove('open');goCity(city)}});
+    return;
+  }
+  if(q.length<2)return;
+  const seq=++remoteSearchSeq;
+  clearTimeout(remoteSearchTimer);
+  remoteSearchTimer=setTimeout(async()=>{
+    searchResults.innerHTML='<button class="search-result" disabled><strong>Orte werden gesucht …</strong><span>PLZ- und Ortssuche unabhängig von SLS-Verkäufen</span></button>';
+    searchResults.classList.add('open');
+    try{
+      const r=await fetch('/api/location-search?q='+encodeURIComponent(q));
+      const d=await r.json();
+      if(seq!==remoteSearchSeq)return;
+      const rows=(d.results||[]).filter(x=>!x.stateKey||x.stateKey==='05'||/nordrhein-westfalen/i.test(x.state||'')).slice(0,6);
+      searchResults.innerHTML=rows.length?rows.map((x,i)=>'<button class="search-result" data-remote="'+i+'"><strong>'+x.postalCode+' · '+(x.name||x.municipality)+'</strong><span>'+(x.municipality&&x.municipality!==x.name?x.municipality+' · ':'')+'Nordrhein-Westfalen</span></button>').join(''):'<button class="search-result" disabled><strong>Kein Treffer in NRW</strong><span>Bitte PLZ oder Ortsnamen prüfen.</span></button>';
+      rows.forEach((x,i)=>{const b=searchResults.querySelector('[data-remote="'+i+'"]');if(b)b.onclick=()=>chooseRemoteLocation(x)});
+    }catch(e){
+      searchResults.innerHTML='<button class="search-result" disabled><strong>Suche gerade nicht verfügbar</strong><span>Bitte erneut versuchen.</span></button>';
+    }
+  },220);
 }
 document.querySelector('.search-wrap').addEventListener('click',()=>{if(mapTools.classList.contains('city-mode')){searchExpandedByUser=true;mapTools.classList.remove('city-mode');setTimeout(()=>marketSearch.focus(),40)}});
 marketSearch.addEventListener('blur',()=>{setTimeout(()=>{if(activeCity&&!searchExpandedByUser&&!searchResults.classList.contains('open'))mapTools.classList.add('city-mode')},120)});
 marketSearch.addEventListener('input',runSearch);
-marketSearch.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=marketSearch.value.trim().toLowerCase();const city=cities.find(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q));if(city){searchResults.classList.remove('open');goCity(city)}}});
+marketSearch.addEventListener('keydown',e=>{if(e.key==='Enter'){const first=searchResults.querySelector('.search-result:not([disabled])');if(first){e.preventDefault();first.click()}}});
 addRegions();updateCrumbs();
 
 function syncMapSize(){
