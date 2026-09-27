@@ -79,6 +79,7 @@
     .source-toggle button{border:0;border-radius:10px;background:#eef3f3;color:var(--brand-dark);font:inherit;font-size:10px;font-weight:800;padding:8px 10px;cursor:pointer}.source-toggle button.active{background:var(--brand);color:#fff}
     .source-toggle span{font-size:9px;color:var(--muted);padding-right:3px}
     .boris-note{position:absolute;z-index:710;right:18px;top:68px;max-width:290px;background:rgba(255,255,255,.95);border-radius:12px;padding:9px 11px;box-shadow:0 8px 22px rgba(25,50,56,.12);font-size:9.5px;line-height:1.35;color:var(--muted);display:none}.boris-note.show{display:block}.boris-note b{color:var(--ink)}
+    .boris-value-pin{background:#fff;border:2px solid var(--brand);border-radius:999px;padding:7px 10px;box-shadow:0 8px 22px rgba(25,50,56,.2);white-space:nowrap;color:var(--brand-dark);font-size:10px;font-weight:850}.boris-value-pin small{font-size:8px;color:var(--muted);font-weight:700;margin-left:4px}
     .district-badge{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;width:182px;min-height:32px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 10px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
     .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;font-weight:760;opacity:.88}.district-badge .district-price{white-space:nowrap;font-size:10px;font-weight:850}
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
@@ -113,7 +114,7 @@
   <main class="main">
     <div id="map"></div>
     <div class="source-toggle"><span>Datenebene</span><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div>
-    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Kartenebene</b><br>Die farbigen Zonen im Kartenhintergrund stammen aus BORIS-NRW. Die SLS-Preis-Pins werden in diesem Testmodus ausgeblendet, damit Demo- und amtliche Daten nicht verwechselt werden. Die amtlichen Werte werden im nächsten Schritt aus den Zonen ausgelesen.</div>
+    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Testebene</b><br>Tippen Sie auf die Karte, um den amtlichen Wert an dieser Position abzufragen.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -168,7 +169,7 @@ const borisLayer=L.tileLayer.wms('https://www.wms.nrw.de/boris/wms_nw_irw',{
 });
 let borisEnabled=false;
 map.zoomControl.setPosition('bottomleft');
-let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region',searchExpandedByUser=false;
+let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region',searchExpandedByUser=false,borisValueMarker=null;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 const priceText=d=>currentMode==='spanne'?new Intl.NumberFormat('de-DE').format(d[currentType][0])+'–'+new Intl.NumberFormat('de-DE').format(d[currentType][1])+' €/m²':fmt(currentType==='wohnung'?d.typW:d.typH);
 const typical=d=>fmt(currentType==='wohnung'?d.typW:d.typH);
@@ -333,6 +334,7 @@ map.on('dragstart zoomstart',()=>{if(window.matchMedia('(max-width:760px)').matc
 const demoLayerBtn=document.getElementById('demoLayerBtn'),borisLayerBtn=document.getElementById('borisLayerBtn'),borisNote=document.getElementById('borisNote');
 function setBorisLayer(on){
   borisEnabled=on;
+  if(!on && borisValueMarker){map.removeLayer(borisValueMarker);borisValueMarker=null;}
   if(on){borisLayer.addTo(map);borisLayer.bringToFront()}else if(map.hasLayer(borisLayer))map.removeLayer(borisLayer);
   borisLayerBtn.classList.toggle('active',on);demoLayerBtn.classList.toggle('active',!on);borisNote.classList.toggle('show',on);
   document.getElementById('panel').classList.remove('open');
@@ -341,6 +343,24 @@ function setBorisLayer(on){
 }
 borisLayerBtn.onclick=()=>setBorisLayer(true);
 demoLayerBtn.onclick=()=>setBorisLayer(false);
+map.on('click',async e=>{
+  if(!borisEnabled) return;
+  borisNote.innerHTML='<b>BORIS-NRW</b><br>Amtlichen Wert für diesen Kartenpunkt laden …';
+  try{
+    const r=await fetch('/api/boris-point?lat='+encodeURIComponent(e.latlng.lat)+'&lon='+encodeURIComponent(e.latlng.lng));
+    const d=await r.json();
+    if(borisValueMarker){map.removeLayer(borisValueMarker);borisValueMarker=null}
+    if(d.found && d.value){
+      const html='<div class="boris-value-pin">'+new Intl.NumberFormat('de-DE').format(Math.round(d.value))+' €/m² <small>BORIS-NRW</small></div>';
+      borisValueMarker=L.marker(e.latlng,{icon:L.divIcon({className:'',html,iconSize:[170,32],iconAnchor:[85,16]),zIndexOffset:1200}).addTo(map);
+      borisNote.innerHTML='<b>Amtlicher BORIS-Wert gefunden</b><br>'+new Intl.NumberFormat('de-DE').format(Math.round(d.value))+' €/m² · Feld: '+(d.valueField||'Richtwert');
+    }else{
+      borisNote.innerHTML='<b>An diesem Punkt kein direkt auslesbarer Wert</b><br>Die amtliche Ebene ist sichtbar, liefert hier aber keinen maschinenlesbaren Immobilienrichtwert.';
+    }
+  }catch(err){
+    borisNote.innerHTML='<b>BORIS-Abfrage nicht verfügbar</b><br>Die Kartenebene bleibt sichtbar. Der Punktwert konnte nicht ausgelesen werden.';
+  }
+});
 document.getElementById('cta').onclick=()=>alert('Im nächsten Schritt würde hier die Adress- und Bewertungsstrecke starten.');
 </script>
 </body>
