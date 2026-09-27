@@ -104,23 +104,108 @@
       .city-badge{width:164px;min-height:32px;padding:6px 9px;gap:6px}.city-badge .city-name{font-size:9px}.city-badge .city-price{font-size:10px}
       .district-badge{width:172px;min-height:30px;padding:6px 9px}.district-badge .district-name{font-size:8.8px}.district-badge .district-price{font-size:9.5px}
     }
+  
+    /* SLS website-aligned visual layer */
+    body{background:#f4f7f5}
+    .app{background:#f4f7f5}
+    .market-header{background:rgba(250,251,249,.96);border-bottom:1px solid rgba(24,50,56,.08);box-shadow:none}
+    .header-inner{max-width:1320px;padding:16px 28px;gap:24px}
+    .brand-row{gap:0}
+    .logo{display:none}
+    .title{display:flex;flex-direction:column;gap:2px}
+    .title .header-eyebrow{font-size:10px;letter-spacing:.16em;font-weight:800;color:var(--brand);text-transform:uppercase}
+    .title strong{font-size:20px;line-height:1.15;font-weight:780;letter-spacing:-.035em}
+    .title .header-meta{font-size:11px;color:#819093;margin:0}
+    .filters{gap:7px;align-items:center}
+    .seg{background:#edf2f0;border:1px solid rgba(24,50,56,.07);padding:3px;border-radius:14px;box-shadow:none}
+    .seg button{font-size:11px;font-weight:720;padding:8px 11px;border-radius:11px}
+    .seg button.active{background:#fff;color:var(--brand-dark);box-shadow:0 3px 12px rgba(25,50,56,.08)}
+    .source-seg button.active{background:var(--brand);color:#fff;box-shadow:none}
+    .main{background:#e7eeeb}
+    #map{inset:0}
+    .intro-card{left:28px;top:24px;width:min(390px,calc(100vw - 56px));padding:18px 52px 18px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.94);box-shadow:0 14px 38px rgba(25,50,56,.11)}
+    .eyebrow{font-size:9.5px;letter-spacing:.16em;margin-bottom:7px}
+    h1{font-size:24px;line-height:1.06;margin-bottom:7px}
+    .intro-card p{font-size:12px;line-height:1.45}
+    .legend{margin-top:11px;padding-top:10px;font-size:10px}
+    .intro-toggle{width:30px;height:30px;right:11px;top:11px;background:#edf3f1}
+    .map-tools{left:28px;top:190px;width:min(390px,calc(100vw - 56px));gap:7px}
+    .search-wrap{min-height:48px;padding:0 15px;border-radius:16px;border:1px solid rgba(24,50,56,.08);background:rgba(255,255,255,.97);box-shadow:0 10px 30px rgba(25,50,56,.10)}
+    .search-wrap svg{width:19px;height:19px}
+    .search-input{font-size:13px;padding:13px 9px}
+    .crumbs{border:1px solid rgba(24,50,56,.07);box-shadow:0 6px 20px rgba(25,50,56,.08);padding:5px 9px}
+    .region-pin{background:rgba(10,70,76,.94);padding:9px 14px;border:1.5px solid rgba(255,255,255,.9);box-shadow:0 10px 24px rgba(10,70,76,.18)}
+    .region-pin strong{font-size:11px;font-weight:740}
+    .city-badge{width:auto;min-width:142px;max-width:178px;min-height:31px;padding:6px 9px;border:1.5px solid rgba(14,91,98,.9);box-shadow:0 7px 18px rgba(25,50,56,.13);gap:6px}
+    .city-badge .dot{width:6px;height:6px}
+    .city-badge .city-name{font-size:9px}
+    .city-badge .city-price{font-size:9.8px}
+    .location-badge{min-height:31px;padding:6px 9px;border-width:1.5px;box-shadow:0 7px 18px rgba(25,50,56,.12);font-size:9px}
+    .district-badge{width:auto;min-width:142px;max-width:170px;min-height:30px;padding:6px 9px;border-width:1.5px;box-shadow:0 7px 18px rgba(25,50,56,.14)}
+    .district-badge .district-name{font-size:9px}.district-badge .district-price{font-size:9.5px}
+    .panel{right:28px;top:24px;width:min(400px,calc(100vw - 56px));border-radius:22px;border:1px solid rgba(24,50,56,.08);box-shadow:0 20px 55px rgba(25,50,56,.17)}
+    .panel-head{padding:18px 20px 17px;background:var(--brand-dark)}
+    .panel-kicker{font-size:9px;letter-spacing:.14em}
+    .panel-title{font-size:22px;margin-top:5px}
+    .panel-body{padding:18px 20px 20px}
+    .metric .value{font-size:27px}
+    .stat{background:#f4f7f5;border-color:#e4ebe8}
+    .cta{border-radius:12px;padding:14px 16px;font-size:13px}
+    .demo{display:none}
+    .leaflet-control-zoom{border-radius:12px;overflow:hidden}
+    .leaflet-control-zoom a{width:34px;height:34px;line-height:34px!important;font-size:18px!important}
+
+    @media(max-width:760px){
+      .app{grid-template-rows:auto minmax(0,1fr)}
+      .header-inner{padding:10px 12px 9px;display:grid;grid-template-columns:1fr;gap:7px}
+      .brand-row{display:block}
+      .title .header-eyebrow{font-size:8px;letter-spacing:.15em}
+      .title strong{font-size:15px}
+      .title .header-meta{display:none}
+      .filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+      .seg{width:100%;display:grid;grid-template-columns:1fr 1fr;padding:2px;border-radius:12px}
+      .seg button{font-size:9.4px;padding:7px 5px;border-radius:10px}
+      .main{min-height:0}
+      .intro-card{left:10px;top:10px;width:auto;max-width:250px;padding:10px 38px 10px 12px;border-radius:15px}
+      .intro-card.compact{max-width:198px;padding:9px 34px 9px 11px}
+      .intro-card.compact .eyebrow{font-size:9px}
+      .intro-toggle{width:25px;height:25px;right:7px;top:7px}
+      .eyebrow{font-size:8.5px;margin-bottom:4px}
+      .intro-card h1{font-size:16px;margin-bottom:5px}
+      .intro-card p{font-size:9.5px;line-height:1.35}
+      .legend{font-size:8.5px;margin-top:7px;padding-top:7px}
+      .map-tools{left:10px;top:56px;width:calc(100vw - 20px);gap:6px}
+      .intro-card:not(.compact) + .panel{}
+      .search-wrap{min-height:44px;border-radius:14px;padding:0 12px}
+      .search-input{font-size:11px;padding:11px 7px}
+      .crumbs{padding:4px 7px}
+      .panel{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));top:auto;width:auto;max-height:64vh;border-radius:20px}
+      .panel-head{padding:14px 16px}.panel-body{padding:14px 16px 16px}
+      .panel-title{font-size:19px}.metric .value{font-size:23px}
+      .city-badge{min-width:132px;max-width:158px;min-height:29px;padding:5px 8px}
+      .city-badge .city-name{font-size:8.6px}.city-badge .city-price{font-size:9.2px}
+      .region-pin{padding:8px 12px}.region-pin strong{font-size:10.5px}
+      .location-badge{min-height:29px;font-size:8.6px}
+      .leaflet-control-attribution{font-size:8px!important}
+    }
+
   </style>
 </head>
 <body>
 <div class="app">
-  <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · Angebotsindikation Stand Sep. 2026</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg source-seg" aria-label="Datenebene"><button id="snapshotLayerBtn" class="active">Angebotsmarkt</button><button id="slsLayerBtn">SLS Daten</button></div></div></div></header>
+  <header class="market-header"><div class="header-inner"><div class="brand-row"><div class="title"><span class="header-eyebrow">SLS IMMOBILIENMARKT</span><strong>Marktpreise in Ihrer Region</strong><span class="header-meta">Angebotsindikation · Stand September 2026</span></div></div><div class="filters"><div class="seg compact-seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg compact-seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Spanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg compact-seg source-seg" aria-label="Datenebene"><button id="snapshotLayerBtn" class="active">Markt</button><button id="slsLayerBtn">SLS</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-        <input id="marketSearch" class="search-input" autocomplete="off" inputmode="search" placeholder="Stadt oder PLZ suchen" aria-label="Stadt oder PLZ suchen">
+        <input id="marketSearch" class="search-input" autocomplete="off" inputmode="search" placeholder="Stadt oder PLZ eingeben" aria-label="Stadt oder PLZ suchen">
       </div>
       <div id="searchResults" class="search-results"></div>
       <nav id="crumbs" class="crumbs" aria-label="Kartennavigation"></nav>
     </div>
-    <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Zoomen Sie in Nordrhein-Westfalen: verfügbare PLZ-Gebiete werden automatisch eingeblendet. Preise erscheinen nur bei ausreichender Datenbasis.</p><div class="legend"><i></i><span>Vergleichen Sie Angebotsmarkt und anonymisierte SLS-Markterfahrung. Preise erscheinen nur bei ausreichender Datenbasis.</span></div></section>
-    <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality" id="panelQuality"><b>Datenbasis:</b> –</div><button class="cta" id="cta">Was ist meine Immobilie wert?</button><div class="fine" id="panelFine">Angebotsindikation · Stand September 2026 · kein Verkehrswert.</div></div></aside>
+    <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">Immobilienmarkt NRW</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Stadt oder PLZ suchen und aktuelle Angebotswerte mit unserer SLS-Markterfahrung vergleichen.</p><div class="legend"><i></i><span>Preisangaben nur bei ausreichender Datenbasis.</span></div></section>
+    <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality" id="panelQuality"><b>Datenbasis:</b> –</div><button class="cta" id="cta">Immobilie kostenlos bewerten</button><div class="fine" id="panelFine">Angebotsindikation · Stand September 2026 · kein Verkehrswert.</div></div></aside>
     <div class="demo"><strong>TESTVERSION</strong>Angebots-Snapshot · Sep. 2026</div>
   </main>
 </div>
