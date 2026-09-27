@@ -55,21 +55,43 @@ function normalizeUnit(u) {
   };
 }
 
+function stage(r) {
+  const s=String(r.statusLabel||'').toLowerCase();
+  if (/(erfolgreich|verkauft|vermarktet)/.test(s)) return 'sold';
+  if (/(maklerauftrag|auftrag|vermarktung|aktiv)/.test(s)) return 'listing';
+  if (/(kontakt|entscheidung|prozess|akquise|bewertung)/.test(s)) return 'lead';
+  return 'other';
+}
+function valid(v){return Number.isFinite(v)&&v>250&&v<20000}
 function summarize(records) {
-  const sold = records.map(r=>r.soldPricePerSqm).filter(v=>Number.isFinite(v) && v > 250 && v < 20000);
-  const asking = records.map(r=>r.askingPricePerSqm).filter(v=>Number.isFinite(v) && v > 250 && v < 20000);
-  const base = sold.length >= 5 ? sold : asking;
-  const basis = sold.length >= 5 ? 'sold' : (asking.length ? 'asking' : 'none');
-  if (!base.length) return { basis:'none', count:0, soldCount:sold.length, askingCount:asking.length };
+  const buckets={sold:[],listing:[],lead:[],other:[]};
+  for(const r of records){
+    const st=stage(r);
+    const v=st==='sold'&&valid(r.soldPricePerSqm)?r.soldPricePerSqm:r.askingPricePerSqm;
+    if(valid(v)) buckets[st].push(v);
+  }
+  const weighted=[];
+  for(const v of buckets.sold) for(let i=0;i<5;i++) weighted.push(v);
+  for(const v of buckets.listing) for(let i=0;i<3;i++) weighted.push(v);
+  for(const v of buckets.lead) weighted.push(v);
+  for(const v of buckets.other) weighted.push(v);
+  if(!weighted.length) return {basis:'none',count:0,buckets:{sold:0,listing:0,lead:0,other:0}};
+  const coreCount=buckets.sold.length+buckets.listing.length+buckets.lead.length;
   return {
-    basis,
-    count: base.length,
-    soldCount: sold.length,
-    askingCount: asking.length,
-    low: round50(quantile(base,.25)),
-    typical: round50(quantile(base,.5)),
-    high: round50(quantile(base,.75)),
-    confidence: sold.length >= 15 ? 'high' : sold.length >= 5 ? 'medium' : 'insufficient'
+    basis:'sls_weighted_market_indication',
+    count:coreCount,
+    weightedCount:weighted.length,
+    buckets:{
+      sold:buckets.sold.length,
+      listing:buckets.listing.length,
+      lead:buckets.lead.length,
+      other:buckets.other.length
+    },
+    low:round50(quantile(weighted,.25)),
+    typical:round50(quantile(weighted,.5)),
+    high:round50(quantile(weighted,.75)),
+    confidence:coreCount>=30?'high':coreCount>=12?'medium':coreCount>=5?'low':'insufficient',
+    methodology:'sold x5, listing x3, lead x1; Angebotspreise und realisierte Kaufpreise bleiben im Rohdatensatz getrennt.'
   };
 }
 
@@ -126,8 +148,9 @@ export default async function handler(req, res) {
       summary,
       records: normalized.slice(0,250),
       notes:{
-        soldPrice:'sold_price wird bevorzugt. Bei weniger als 5 belastbaren Verkaufspreisen wird nur eine separate Angebotsmarkt-Indikation berechnet.',
-        noMixing:'Verkaufs- und Angebotspreise werden nicht zu einem gemeinsamen Mittelwert vermischt.'
+        model:'SLS-Marktindikation aus drei internen Reifestufen: Kontakt-/Entscheidungsprozess, aktive Vermarktung/Maklerauftrag und erfolgreich vermarktet.',
+        weights:'Erfolgreich vermarktet wird stärker gewichtet als aktive Vermarktung; Kontakt-/Entscheidungsprozesse dienen vor allem zur Verbreiterung der regionalen Datenbasis.',
+        caution:'Das Ergebnis ist eine SLS-Marktindikation und kein amtlicher Verkehrswert.'
       }
     });
   } catch (err) {
