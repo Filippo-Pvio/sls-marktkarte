@@ -98,7 +98,7 @@
       .legend{margin-top:8px;padding-top:8px;font-size:9.5px;line-height:1.25}.legend i{width:6px;height:6px;box-shadow:0 0 0 4px rgba(216,180,108,.15)}
       .panel{left:10px;right:10px;top:auto;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:62vh;overflow:auto;border-radius:18px;transform:translateY(calc(100% + 40px))}
       .panel.open{transform:none}.panel-head{padding:14px 16px}.panel-title{font-size:20px}.panel-body{padding:14px 16px 16px}.metric .value{font-size:24px}
-      .demo{display:none}.source-toggle{right:10px;top:10px;padding:5px;gap:4px}.source-toggle span{display:none}.source-toggle button{font-size:9px;padding:7px 8px}.boris-note{right:10px;top:52px;max-width:220px;font-size:8.5px}
+      .demo{display:none}.source-toggle{right:10px;top:10px;padding:5px;gap:4px}.source-toggle span{display:none}.source-toggle button{font-size:9px;padding:7px 8px}.boris-note{left:10px;right:auto;top:106px;max-width:min(330px,calc(100vw - 20px));font-size:8.5px}
       .leaflet-control-zoom{margin-left:10px!important;margin-bottom:max(10px,env(safe-area-inset-bottom))!important}
       .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
       .region-pin{padding:9px 13px}.region-pin strong{font-size:11.5px}
@@ -113,7 +113,7 @@
   <main class="main">
     <div id="map"></div>
     <div class="source-toggle"><span>Datenebene</span><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div>
-    <div id="borisNote" class="boris-note"><b>Amtliche Testebene</b><br>Immobilienrichtwerte/-zonen aus BORIS-NRW. Verfügbarkeit ist je Gutachterausschuss unterschiedlich. Diese Ebene dient zunächst zur Prüfung der Eignung für die SLS-Marktkarte.</div>
+    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Kartenebene</b><br>Die farbigen Zonen im Kartenhintergrund stammen aus BORIS-NRW. Die SLS-Preis-Pins werden in diesem Testmodus ausgeblendet, damit Demo- und amtliche Daten nicht verwechselt werden. Die amtlichen Werte werden im nächsten Schritt aus den Zonen ausgelesen.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -211,6 +211,7 @@ function regionIcon(r){
 }
 function addRegions(){
   clearMarkers();renderLevel='region';activeCity=null;
+  if(borisEnabled) return;
   regions.forEach(r=>{
     const m=L.marker([r.lat,r.lon],{icon:regionIcon(r)}).addTo(map);
     m.on('click',()=>{activeRegion=r;activeCity=null;updateCrumbs();document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.7});setTimeout(renderForView,650)});
@@ -227,6 +228,7 @@ function visibleCityData(data){
 }
 function addData(data,cityMode=false){
   clearMarkers();renderLevel=cityMode?'city':'detail';
+  if(borisEnabled) return;
   const shown=cityMode?visibleCityData(data):data;
   shown.forEach(d=>{
     const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,cityMode),riseOnHover:true}).addTo(map);
@@ -333,6 +335,9 @@ function setBorisLayer(on){
   borisEnabled=on;
   if(on){borisLayer.addTo(map);borisLayer.bringToFront()}else if(map.hasLayer(borisLayer))map.removeLayer(borisLayer);
   borisLayerBtn.classList.toggle('active',on);demoLayerBtn.classList.toggle('active',!on);borisNote.classList.toggle('show',on);
+  document.getElementById('panel').classList.remove('open');
+  mapTools.classList.remove('hidden-for-panel');
+  renderForView();
 }
 borisLayerBtn.onclick=()=>setBorisLayer(true);
 demoLayerBtn.onclick=()=>setBorisLayer(false);
