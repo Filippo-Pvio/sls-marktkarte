@@ -75,10 +75,8 @@
     .quality{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.45}.quality b{color:var(--ink)}
     .cta{margin-top:16px;width:100%;border:0;border-radius:14px;padding:13px 16px;background:var(--brand);color:white;font:inherit;font-weight:800;cursor:pointer}
     .fine{margin-top:9px;font-size:10.5px;color:#809094;line-height:1.35}
-    .source-toggle{position:absolute;z-index:720;right:18px;top:18px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:14px;padding:7px;box-shadow:0 10px 28px rgba(25,50,56,.13);display:flex;align-items:center;gap:7px}
-    .source-toggle button{border:0;border-radius:10px;background:#eef3f3;color:var(--brand-dark);font:inherit;font-size:10px;font-weight:800;padding:8px 10px;cursor:pointer}.source-toggle button.active{background:var(--brand);color:#fff}
-    .source-toggle span{font-size:9px;color:var(--muted);padding-right:3px}
-    .boris-note{position:absolute;z-index:710;right:18px;top:68px;max-width:290px;background:rgba(255,255,255,.95);border-radius:12px;padding:9px 11px;box-shadow:0 8px 22px rgba(25,50,56,.12);font-size:9.5px;line-height:1.35;color:var(--muted);display:none}.boris-note.show{display:block}.boris-note b{color:var(--ink)}
+    .source-seg button.active{background:var(--brand);color:#fff}
+    .boris-note{position:absolute;z-index:710;right:18px;bottom:52px;max-width:300px;background:rgba(255,255,255,.96);border-radius:12px;padding:9px 11px;box-shadow:0 8px 22px rgba(25,50,56,.12);font-size:9.5px;line-height:1.35;color:var(--muted);display:none}.boris-note.show{display:block}.boris-note b{color:var(--ink)}
     .boris-value-pin{background:#fff;border:2px solid var(--brand);border-radius:999px;padding:7px 10px;box-shadow:0 8px 22px rgba(25,50,56,.2);white-space:nowrap;color:var(--brand-dark);font-size:10px;font-weight:850}.boris-value-pin small{font-size:8px;color:var(--muted);font-weight:700;margin-left:4px}
     .district-badge{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;width:182px;min-height:32px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 10px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
     .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;font-weight:760;opacity:.88}.district-badge .district-price{white-space:nowrap;font-size:10px;font-weight:850}
@@ -99,7 +97,7 @@
       .legend{margin-top:8px;padding-top:8px;font-size:9.5px;line-height:1.25}.legend i{width:6px;height:6px;box-shadow:0 0 0 4px rgba(216,180,108,.15)}
       .panel{left:10px;right:10px;top:auto;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:62vh;overflow:auto;border-radius:18px;transform:translateY(calc(100% + 40px))}
       .panel.open{transform:none}.panel-head{padding:14px 16px}.panel-title{font-size:20px}.panel-body{padding:14px 16px 16px}.metric .value{font-size:24px}
-      .demo{display:none}.source-toggle{right:10px;top:10px;padding:5px;gap:4px}.source-toggle span{display:none}.source-toggle button{font-size:9px;padding:7px 8px}.boris-note{left:10px;right:auto;top:106px;max-width:min(330px,calc(100vw - 20px));font-size:8.5px}
+      .demo{display:none}.source-seg{flex:0 0 auto}.source-seg button{font-size:10px;padding:7px 9px}.boris-note{left:10px;right:10px;bottom:max(48px,calc(env(safe-area-inset-bottom) + 38px));top:auto;max-width:none;font-size:8.5px}
       .leaflet-control-zoom{margin-left:10px!important;margin-bottom:max(10px,env(safe-area-inset-bottom))!important}
       .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
       .region-pin{padding:9px 13px}.region-pin strong{font-size:11.5px}
@@ -110,11 +108,10 @@
 </head>
 <body>
 <div class="app">
-  <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div></div></div></header>
+  <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg source-seg" aria-label="Datenebene"><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
-    <div class="source-toggle"><span>Datenebene</span><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div>
-    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Testebene</b><br>Tippen Sie auf die Karte, um den amtlichen Wert an dieser Position abzufragen.</div>
+    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Testebene</b><br>Tippen Sie auf die Karte, um einen amtlichen Punktwert zu prüfen.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -345,7 +342,7 @@ borisLayerBtn.onclick=()=>setBorisLayer(true);
 demoLayerBtn.onclick=()=>setBorisLayer(false);
 map.on('click',async e=>{
   if(!borisEnabled) return;
-  borisNote.innerHTML='<b>BORIS-NRW</b><br>Amtlichen Wert für diesen Kartenpunkt laden …';
+  borisNote.innerHTML='<b>BORIS-NRW</b><br>Amtlichen Punktwert laden …';
   try{
     const r=await fetch('/api/boris-point?lat='+encodeURIComponent(e.latlng.lat)+'&lon='+encodeURIComponent(e.latlng.lng));
     const d=await r.json();
@@ -355,7 +352,7 @@ map.on('click',async e=>{
       borisValueMarker=L.marker(e.latlng,{icon:L.divIcon({className:'',html,iconSize:[170,32],iconAnchor:[85,16]}),zIndexOffset:1200}).addTo(map);
       borisNote.innerHTML='<b>Amtlicher BORIS-Wert gefunden</b><br>'+new Intl.NumberFormat('de-DE').format(Math.round(d.value))+' €/m² · Feld: '+(d.valueField||'Richtwert');
     }else{
-      borisNote.innerHTML='<b>An diesem Punkt kein direkt auslesbarer Wert</b><br>Die amtliche Ebene ist sichtbar, liefert hier aber keinen maschinenlesbaren Immobilienrichtwert.';
+      borisNote.innerHTML='<b>Kein Punktwert an dieser Stelle</b><br>Der WMS liefert hier keinen direkt auslesbaren Immobilienrichtwert. Für die flächendeckende Darstellung verwenden wir als nächsten Schritt den amtlichen 2026-Shapefile-Datensatz.';
     }
   }catch(err){
     borisNote.innerHTML='<b>BORIS-Abfrage nicht verfügbar</b><br>Die Kartenebene bleibt sichtbar. Der Punktwert konnte nicht ausgelesen werden.';
