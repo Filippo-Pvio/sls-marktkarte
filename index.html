@@ -189,6 +189,94 @@
       .leaflet-control-attribution{font-size:8px!important}
     }
 
+  
+    /* Exact SLS homepage palette + mobile layout alignment */
+    :root{
+      --ink:#0b1112;
+      --stone:#8e8c8a;
+      --sky:#6c97ab;
+      --paper:#fff9f3;
+      --coral:#ff596f;
+      --white:#ffffff;
+      --line:rgba(11,17,18,.18);
+      --muted:#5f5d5b;
+      --brand:#6c97ab;
+      --brand-dark:#0b1112;
+      --brand-soft:rgba(108,151,171,.14);
+      --accent:#ff596f;
+      --shadow:0 16px 42px rgba(11,17,18,.12);
+    }
+    html,body{background:var(--paper);color:var(--ink);font-family:"Raleway",Arial,sans-serif}
+    .app{background:var(--paper)}
+    .market-header{background:rgba(255,249,243,.97);border-bottom:1px solid var(--line)}
+    .title .header-eyebrow{color:var(--ink)}
+    .title strong{font-family:"Playfair Display",Georgia,serif;font-weight:550;color:var(--ink)}
+    .title .header-meta{color:var(--muted)}
+    .seg{background:rgba(108,151,171,.10);border:1px solid rgba(11,17,18,.13)}
+    .seg button{color:var(--muted)}
+    .seg button.active,.source-seg button.active{background:var(--sky);color:var(--ink);box-shadow:none}
+    .seg button:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+    .main{background:var(--paper)}
+    .intro-card{background:rgba(255,249,243,.95);border-color:rgba(11,17,18,.10);box-shadow:0 15px 38px rgba(11,17,18,.11)}
+    .eyebrow{color:var(--ink)}
+    .intro-card h1{font-family:"Playfair Display",Georgia,serif;font-weight:550;color:var(--ink);letter-spacing:0}
+    .intro-card p,.legend{color:var(--muted)}
+    .legend{border-top-color:var(--line)}
+    .legend i{background:var(--coral);box-shadow:0 0 0 5px rgba(255,89,111,.12)}
+    .intro-toggle{background:rgba(108,151,171,.15);color:var(--ink)}
+    .search-wrap{background:rgba(255,249,243,.97);border-color:rgba(11,17,18,.12);box-shadow:0 10px 28px rgba(11,17,18,.10)}
+    .search-wrap svg{color:var(--ink)}
+    .search-input{color:var(--ink)}
+    .search-input::placeholder{color:#777370}
+    .search-results{background:var(--paper)}
+    .search-result{background:var(--paper);border-bottom-color:var(--line);color:var(--ink)}
+    .search-result span{color:var(--muted)}
+    .crumbs{background:rgba(255,249,243,.95);border-color:rgba(11,17,18,.10);box-shadow:0 6px 18px rgba(11,17,18,.08)}
+    .crumbs button{color:var(--ink)}
+    .crumbs .current{color:var(--coral)}
+    .region-pin{background:rgba(11,17,18,.93);color:var(--paper);border-color:rgba(255,249,243,.92);box-shadow:0 10px 24px rgba(11,17,18,.18)}
+    .city-badge{background:rgba(255,249,243,.97);color:var(--ink);border-color:var(--sky);box-shadow:0 7px 18px rgba(11,17,18,.12)}
+    .city-badge .dot{background:var(--coral)}
+    .city-badge .city-name{color:var(--muted)}
+    .city-badge .city-price{color:var(--ink)}
+    .location-badge{background:rgba(255,249,243,.97);color:var(--ink);border-color:var(--sky);box-shadow:0 7px 18px rgba(11,17,18,.11)}
+    .location-badge i{background:var(--coral)}
+    .location-badge.muted{border-color:rgba(11,17,18,.24);color:var(--muted)}
+    .district-badge{background:rgba(11,17,18,.93);color:var(--paper);border-color:var(--paper)}
+    .panel{background:var(--paper);border-color:rgba(11,17,18,.10);box-shadow:0 20px 55px rgba(11,17,18,.18)}
+    .panel-head{background:var(--ink);color:var(--paper)}
+    .panel-kicker{color:var(--sky);opacity:1}
+    .panel-title{font-family:"Playfair Display",Georgia,serif;font-weight:550}
+    .panel-close{background:rgba(255,249,243,.12);color:var(--paper)}
+    .metric{border-bottom-color:var(--line)}
+    .metric .label,.metric .type,.quality,.fine{color:var(--muted)}
+    .stat{background:rgba(108,151,171,.10);border-color:rgba(11,17,18,.10)}
+    .cta{background:var(--sky);color:var(--ink);border:1px solid var(--sky);font-weight:750}
+    .cta:hover{background:var(--coral);border-color:var(--coral);color:#fff}
+    .leaflet-control-zoom a{background:var(--paper)!important;color:var(--ink)!important}
+    .leaflet-control-attribution{background:rgba(255,249,243,.88)!important;color:var(--muted)!important}
+
+    @media(max-width:760px){
+      .header-inner{padding:10px 12px 9px}
+      .title strong{font-size:17px;line-height:1.05}
+      .filters{gap:5px}
+      .seg{background:rgba(108,151,171,.11)}
+      .seg button{padding:7px 4px;font-size:9.2px}
+      .intro-card,.intro-card.compact{
+        left:10px;top:10px;width:auto;max-width:205px;
+        padding:9px 34px 9px 11px;border-radius:14px;
+      }
+      .intro-card h1,.intro-card p,.intro-card .legend{display:none!important}
+      .intro-card .eyebrow{margin:0;font-size:8.8px;letter-spacing:.11em;text-transform:uppercase}
+      .intro-card .eyebrow::after{content:" · NRW";font-weight:800}
+      .intro-toggle{display:none}
+      .map-tools{left:10px;top:55px;width:calc(100vw - 20px);gap:6px}
+      .search-wrap{min-height:46px;background:rgba(255,249,243,.98);border-radius:14px}
+      .search-input{font-size:11px}
+      .crumbs{background:rgba(255,249,243,.96)}
+      .panel{background:var(--paper)}
+    }
+
   </style>
 </head>
 <body>
