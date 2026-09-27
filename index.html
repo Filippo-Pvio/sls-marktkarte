@@ -62,7 +62,7 @@
     .city-badge .dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--accent)}
     .city-badge .city-name{flex:0 1 auto;min-width:0;font-size:10px;color:var(--muted);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .city-badge .city-price{margin-left:auto;flex:0 0 auto;font-size:11px;white-space:nowrap}
-    .location-badge{display:flex;align-items:center;gap:7px;min-height:34px;background:rgba(255,255,255,.97);color:var(--brand-dark);border:2px solid var(--brand);border-radius:999px;padding:7px 11px;box-shadow:0 8px 22px rgba(25,50,56,.18);font-weight:800;font-size:10px;white-space:nowrap}.location-badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);display:block}
+    .location-badge{display:flex;align-items:center;gap:7px;min-height:34px;background:rgba(255,255,255,.97);color:var(--brand-dark);border:2px solid var(--brand);border-radius:999px;padding:7px 11px;box-shadow:0 8px 22px rgba(25,50,56,.18);font-weight:800;font-size:10px;white-space:nowrap}.location-badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);display:block}.location-badge.muted{border-color:#a8b7b9;color:#63767a;opacity:.9}.location-badge.muted i{background:#a8b7b9}
     .demo{position:absolute;z-index:650;right:18px;bottom:18px;background:rgba(24,50,56,.92);color:white;border-radius:12px;padding:10px 12px;font-size:11px;line-height:1.3;box-shadow:0 10px 30px rgba(0,0,0,.16)}
     .demo strong{display:block;margin-bottom:2px}
     .panel{position:absolute;z-index:800;right:24px;top:24px;width:min(390px,calc(100vw - 48px));background:white;border-radius:22px;box-shadow:var(--shadow);overflow:hidden;transform:translateX(calc(100% + 50px));opacity:0;transition:.28s cubic-bezier(.2,.8,.2,1)}
@@ -119,7 +119,7 @@
       <div id="searchResults" class="search-results"></div>
       <nav id="crumbs" class="crumbs" aria-label="Kartennavigation"></nav>
     </div>
-    <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Suchen Sie jede Stadt oder PLZ in Nordrhein-Westfalen. Preise erscheinen nur dort, wo eine ausreichende Datenbasis vorhanden ist.</p><div class="legend"><i></i><span>Vergleichen Sie Angebotsmarkt und anonymisierte SLS-Markterfahrung. Preise erscheinen nur bei ausreichender Datenbasis.</span></div></section>
+    <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Zoomen Sie in Nordrhein-Westfalen: verfügbare PLZ-Gebiete werden automatisch eingeblendet. Preise erscheinen nur bei ausreichender Datenbasis.</p><div class="legend"><i></i><span>Vergleichen Sie Angebotsmarkt und anonymisierte SLS-Markterfahrung. Preise erscheinen nur bei ausreichender Datenbasis.</span></div></section>
     <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality" id="panelQuality"><b>Datenbasis:</b> –</div><button class="cta" id="cta">Was ist meine Immobilie wert?</button><div class="fine" id="panelFine">Angebotsindikation · Stand September 2026 · kein Verkehrswert.</div></div></aside>
     <div class="demo"><strong>TESTVERSION</strong>Angebots-Snapshot · Sep. 2026</div>
   </main>
@@ -206,7 +206,7 @@ const regions=[
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
-let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,activeLocation=null,renderLevel='region',searchExpandedByUser=false;
+let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,activeLocation=null,renderLevel='region',searchExpandedByUser=false,viewportSeq=0,viewportTimer=0;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 function sourceDatum(d){
   if(dataSource==='snapshot') return offerSnapshot[String(d.plz||'')]?.[currentType]||null;
@@ -238,6 +238,43 @@ function typical(d){
   return fmt(currentType==='wohnung'?d.typW:d.typH);
 }
 function clearMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[]}
+async function loadViewportLocations(){
+  if(activeLocation) return;
+  const z=map.getZoom();
+  if(z<9.15) return;
+  const seq=++viewportSeq,b=map.getBounds();
+  try{
+    const u='/api/visible-locations?north='+encodeURIComponent(b.getNorth())+'&south='+encodeURIComponent(b.getSouth())+'&east='+encodeURIComponent(b.getEast())+'&west='+encodeURIComponent(b.getWest())+'&zoom='+encodeURIComponent(z);
+    const r=await fetch(u),x=await r.json();
+    if(seq!==viewportSeq||activeLocation) return;
+    const data=(x.results||[]).map(v=>({name:v.name,plz:String(v.postalCode),lat:Number(v.lat),lon:Number(v.lon),wohnung:[0,0],haus:[0,0],typW:0,typH:0}));
+    if(dataSource==='sls'){
+      const max=z>=11?24:14;
+      await Promise.all(data.slice(0,max).map(d=>loadSlsDatum(d)));
+      if(seq!==viewportSeq) return;
+    }
+    clearMarkers();renderLevel='viewport';
+    const usable=data.filter(d=>sourceDatum(d));
+    const noData=data.filter(d=>!sourceDatum(d));
+    const selected=usable.slice(0,z>=11?28:16);
+    selected.forEach(d=>{
+      const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,true),riseOnHover:true}).addTo(map);
+      m.on('click',()=>{activeLocation=d;updateCrumbs();openPanel(d,'PLZ-Gebiet')});markers.push(m);
+    });
+    if(z>=11.25){
+      noData.slice(0,Math.max(0,18-selected.length)).forEach(d=>{
+        const html='<div class="location-badge muted"><i></i>'+d.plz+' · '+d.name+'</div>';
+        const m=L.marker([d.lat,d.lon],{icon:L.divIcon({className:'',html,iconSize:[190,34],iconAnchor:[95,17]})}).addTo(map);
+        m.on('click',()=>{activeLocation=d;updateCrumbs();openPanel(d,'PLZ-Gebiet')});markers.push(m);
+      });
+    }
+    clampAllMarkers();
+  }catch(e){}
+}
+function scheduleViewportLocations(){
+  clearTimeout(viewportTimer);
+  viewportTimer=setTimeout(loadViewportLocations,180);
+}
 function addSelectedLocation(){
   if(!activeLocation) return;
   clearMarkers();
@@ -369,19 +406,9 @@ function nearestCity(){const center=map.getCenter();return cities.slice().sort((
 function renderForView(){
   const z=map.getZoom();
   if(activeLocation&&z>=10.8){addSelectedLocation();updateCrumbs();return}
-  if(z<8.8){activeRegion=null;activeCity=null;addRegions();updateCrumbs();return}
-  if(z<10.8){
-    const r=activeRegion||nearestRegion();
-    activeRegion=r;activeCity=null;
-    addData(cities.filter(c=>r.cities.includes(c.name)),true);updateCrumbs();
-    return
-  }
-  const city=activeCity||nearestCity();
-  activeCity=city;
-  activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;
-  if(dataSource==='snapshot'||dataSource==='sls') addData([city],true);
-  else if(detailMarkets[city.name]) addData(detailMarkets[city.name],false);
-  else addData([city],true);
+  if(z<9.15){activeRegion=null;activeCity=null;addRegions();updateCrumbs();return}
+  activeCity=null;
+  scheduleViewportLocations();
   updateCrumbs();
 }
 function update(){renderForView()}
@@ -478,7 +505,7 @@ if('ResizeObserver' in window){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden) setTimeout(syncMapSize,80)});
 
 let renderTimer;
-map.on('zoomend moveend',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(activeLocation&&map.getZoom()<10.8)activeLocation=null;renderForView();setTimeout(clampAllMarkers,40)},80)});
+map.on('zoomend moveend',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(activeLocation&&map.getZoom()<9.15)activeLocation=null;renderForView();setTimeout(clampAllMarkers,40)},80)});
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-type]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;update();document.getElementById('panel').classList.remove('open')}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentMode=b.dataset.mode;update();document.getElementById('panel').classList.remove('open')}));
 document.getElementById('panelClose').onclick=()=>{document.getElementById('panel').classList.remove('open');mapTools.classList.remove('hidden-for-panel');searchExpandedByUser=true;updateCrumbs();mapTools.classList.remove('city-mode')};
