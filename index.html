@@ -290,11 +290,6 @@
     /* Calmer premium basemap treatment for the SLS website */
     .leaflet-tile-pane{filter:grayscale(.72) saturate(.38) brightness(1.12) contrast(.82) sepia(.10);opacity:.88}
 
-  
-    .google-basemap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:#fff9f3;z-index:1}
-    .google-basemap>div{width:100%!important;height:100%!important}
-    .leaflet-tile-pane:has(.google-basemap){filter:none!important;opacity:1!important}
-
 </style>
 </head>
 <body>
@@ -316,6 +311,7 @@
   </main>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.gridlayer.googlemutant@0.14.0/dist/Leaflet.GoogleMutant.js"></script>
 <script>
 const cities=[
 {name:'Dorsten',plz:'46282',lat:51.660,lon:6.965,wohnung:[2350,2950],haus:[2550,3350],typW:2650,typH:2940,marketScope:'city'},
@@ -449,51 +445,35 @@ let baseLayer=osmBase.addTo(map);
 
 function loadGoogleBasemap(){
   if(!GOOGLE_MAPS_BROWSER_KEY) return;
+  window.gm_authFailure=()=>{console.warn('Google Maps authentication failed; keeping OSM fallback.');};
   const script=document.createElement('script');
   script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_BROWSER_KEY);
   script.async=true;
   script.defer=true;
   script.onload=()=>{
-    if(!window.google?.maps) return;
-    class GoogleMutant extends L.GridLayer{
-      onAdd(m){
-        this._map=m;
-        this._container=L.DomUtil.create('div','google-basemap');
-        this._container.style.position='absolute';
-        this._container.style.inset='0';
-        this._container.style.width='100%';
-        this._container.style.height='100%';
-        this.getPane().appendChild(this._container);
-        this._gmap=new google.maps.Map(this._container,{
-          center:{lat:m.getCenter().lat,lng:m.getCenter().lng},
-          zoom:Math.round(m.getZoom()),
-          disableDefaultUI:true,
-          clickableIcons:false,
-          gestureHandling:'none',
-          keyboardShortcuts:false,
-          mapTypeId:'roadmap',
-          styles:[
-            {elementType:'geometry',stylers:[{color:'#f7f5f1'}]},
-            {elementType:'labels.text.fill',stylers:[{color:'#5f5d5b'}]},
-            {elementType:'labels.text.stroke',stylers:[{color:'#fff9f3'}]},
-            {featureType:'road',elementType:'geometry',stylers:[{color:'#ffffff'}]},
-            {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#e5e1db'}]},
-            {featureType:'water',elementType:'geometry',stylers:[{color:'#d9e6ea'}]},
-            {featureType:'poi',elementType:'geometry',stylers:[{color:'#edf0e9'}]},
-            {featureType:'transit',stylers:[{visibility:'off'}]}
-          ]
-        });
-        this._sync=()=>this._gmap?.setOptions({center:{lat:m.getCenter().lat,lng:m.getCenter().lng},zoom:Math.round(m.getZoom())});
-        m.on('move zoom resize',this._sync);
-        setTimeout(()=>{google.maps.event.trigger(this._gmap,'resize');this._sync();},0);
-      }
-      onRemove(m){m.off('move zoom resize',this._sync);this._container?.remove();}
-      createTile(){return document.createElement('div');}
+    if(!window.google?.maps || typeof L.gridLayer?.googleMutant!=='function') return;
+    try{
+      const googleLayer=L.gridLayer.googleMutant({
+        type:'roadmap',
+        maxZoom:20,
+        styles:[
+          {elementType:'geometry',stylers:[{color:'#f7f5f1'}]},
+          {elementType:'labels.text.fill',stylers:[{color:'#5f5d5b'}]},
+          {elementType:'labels.text.stroke',stylers:[{color:'#fff9f3'}]},
+          {featureType:'road',elementType:'geometry',stylers:[{color:'#ffffff'}]},
+          {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#e5e1db'}]},
+          {featureType:'water',elementType:'geometry',stylers:[{color:'#d9e6ea'}]},
+          {featureType:'poi',elementType:'geometry',stylers:[{color:'#edf0e9'}]},
+          {featureType:'transit',stylers:[{visibility:'off'}]}
+        ]
+      });
+      googleLayer.on('tileerror',()=>{});
+      map.removeLayer(baseLayer);
+      baseLayer=googleLayer.addTo(map);
+      setTimeout(()=>map.invalidateSize(false),100);
+    }catch(e){
+      console.warn('Google basemap init failed; keeping OSM fallback.');
     }
-    const googleLayer=new GoogleMutant({pane:'tilePane'});
-    map.removeLayer(baseLayer);
-    baseLayer=googleLayer.addTo(map);
-    setTimeout(()=>map.invalidateSize(false),50);
   };
   script.onerror=()=>{};
   document.head.appendChild(script);
