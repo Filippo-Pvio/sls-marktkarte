@@ -1,0 +1,28 @@
+name: Build BORIS NRW data
+on:
+  push:
+    paths: [".github/workflows/build-boris-data.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyshp pyproj
+      - name: Download official BORIS NRW data
+        run: curl -L --fail --retry 3 "https://www.opengeodata.nrw.de/produkte/infrastruktur_bauen_wohnen/boris/IRW/IRW_EPSG25832_Shape.zip" -o /tmp/irw.zip
+      - name: Convert for web
+        run: |
+          rm -rf data/boris/2026
+          python scripts/build_boris_data.py /tmp/irw.zip data/boris/2026
+      - name: Commit generated data
+        run: |
+          git config user.name "sls-data-bot"
+          git config user.email "info@sls.de"
+          git add data/boris/2026
+          if git diff --cached --quiet; then echo "No changes"; else git commit -m "Update BORIS NRW processed data"; git push; fi
