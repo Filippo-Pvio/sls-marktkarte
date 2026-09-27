@@ -352,7 +352,7 @@ map.on('click',async e=>{
     if(borisValueMarker){map.removeLayer(borisValueMarker);borisValueMarker=null}
     if(d.found && d.value){
       const html='<div class="boris-value-pin">'+new Intl.NumberFormat('de-DE').format(Math.round(d.value))+' €/m² <small>BORIS-NRW</small></div>';
-      borisValueMarker=L.marker(e.latlng,{icon:L.divIcon({className:'',html,iconSize:[170,32],iconAnchor:[85,16]),zIndexOffset:1200}).addTo(map);
+      borisValueMarker=L.marker(e.latlng,{icon:L.divIcon({className:'',html,iconSize:[170,32],iconAnchor:[85,16]}),zIndexOffset:1200}).addTo(map);
       borisNote.innerHTML='<b>Amtlicher BORIS-Wert gefunden</b><br>'+new Intl.NumberFormat('de-DE').format(Math.round(d.value))+' €/m² · Feld: '+(d.valueField||'Richtwert');
     }else{
       borisNote.innerHTML='<b>An diesem Punkt kein direkt auslesbarer Wert</b><br>Die amtliche Ebene ist sichtbar, liefert hier aber keinen maschinenlesbaren Immobilienrichtwert.';
