@@ -75,6 +75,10 @@
     .quality{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.45}.quality b{color:var(--ink)}
     .cta{margin-top:16px;width:100%;border:0;border-radius:14px;padding:13px 16px;background:var(--brand);color:white;font:inherit;font-weight:800;cursor:pointer}
     .fine{margin-top:9px;font-size:10.5px;color:#809094;line-height:1.35}
+    .source-toggle{position:absolute;z-index:720;right:18px;top:18px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:14px;padding:7px;box-shadow:0 10px 28px rgba(25,50,56,.13);display:flex;align-items:center;gap:7px}
+    .source-toggle button{border:0;border-radius:10px;background:#eef3f3;color:var(--brand-dark);font:inherit;font-size:10px;font-weight:800;padding:8px 10px;cursor:pointer}.source-toggle button.active{background:var(--brand);color:#fff}
+    .source-toggle span{font-size:9px;color:var(--muted);padding-right:3px}
+    .boris-note{position:absolute;z-index:710;right:18px;top:68px;max-width:290px;background:rgba(255,255,255,.95);border-radius:12px;padding:9px 11px;box-shadow:0 8px 22px rgba(25,50,56,.12);font-size:9.5px;line-height:1.35;color:var(--muted);display:none}.boris-note.show{display:block}.boris-note b{color:var(--ink)}
     .district-badge{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;width:182px;min-height:32px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 10px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
     .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;font-weight:760;opacity:.88}.district-badge .district-price{white-space:nowrap;font-size:10px;font-weight:850}
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
@@ -94,7 +98,7 @@
       .legend{margin-top:8px;padding-top:8px;font-size:9.5px;line-height:1.25}.legend i{width:6px;height:6px;box-shadow:0 0 0 4px rgba(216,180,108,.15)}
       .panel{left:10px;right:10px;top:auto;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:62vh;overflow:auto;border-radius:18px;transform:translateY(calc(100% + 40px))}
       .panel.open{transform:none}.panel-head{padding:14px 16px}.panel-title{font-size:20px}.panel-body{padding:14px 16px 16px}.metric .value{font-size:24px}
-      .demo{display:none}
+      .demo{display:none}.source-toggle{right:10px;top:10px;padding:5px;gap:4px}.source-toggle span{display:none}.source-toggle button{font-size:9px;padding:7px 8px}.boris-note{right:10px;top:52px;max-width:220px;font-size:8.5px}
       .leaflet-control-zoom{margin-left:10px!important;margin-bottom:max(10px,env(safe-area-inset-bottom))!important}
       .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
       .region-pin{padding:9px 13px}.region-pin strong{font-size:11.5px}
@@ -108,6 +112,8 @@
   <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
+    <div class="source-toggle"><span>Datenebene</span><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div>
+    <div id="borisNote" class="boris-note"><b>Amtliche Testebene</b><br>Immobilienrichtwerte/-zonen aus BORIS-NRW. Verfügbarkeit ist je Gutachterausschuss unterschiedlich. Diese Ebene dient zunächst zur Prüfung der Eignung für die SLS-Marktkarte.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -152,6 +158,15 @@ const regions=[
 ];
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
+const borisLayer=L.tileLayer.wms('https://www.wms.nrw.de/boris/wms_nw_irw',{
+  layers:'irwz,irw',
+  format:'image/png',
+  transparent:true,
+  version:'1.3.0',
+  opacity:.72,
+  attribution:'Immobilienrichtwerte: BORIS-NRW · dl-de/zero-2-0'
+});
+let borisEnabled=false;
 map.zoomControl.setPosition('bottomleft');
 let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region',searchExpandedByUser=false;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
@@ -313,6 +328,14 @@ function setIntroCompact(compact){intro.classList.toggle('compact',compact);intr
 introToggle.onclick=()=>setIntroCompact(!intro.classList.contains('compact'));
 if(window.matchMedia('(max-width:760px)').matches){setIntroCompact(true)}
 map.on('dragstart zoomstart',()=>{if(window.matchMedia('(max-width:760px)').matches)setIntroCompact(true)});
+const demoLayerBtn=document.getElementById('demoLayerBtn'),borisLayerBtn=document.getElementById('borisLayerBtn'),borisNote=document.getElementById('borisNote');
+function setBorisLayer(on){
+  borisEnabled=on;
+  if(on){borisLayer.addTo(map);borisLayer.bringToFront()}else if(map.hasLayer(borisLayer))map.removeLayer(borisLayer);
+  borisLayerBtn.classList.toggle('active',on);demoLayerBtn.classList.toggle('active',!on);borisNote.classList.toggle('show',on);
+}
+borisLayerBtn.onclick=()=>setBorisLayer(true);
+demoLayerBtn.onclick=()=>setBorisLayer(false);
 document.getElementById('cta').onclick=()=>alert('Im nächsten Schritt würde hier die Adress- und Bewertungsstrecke starten.');
 </script>
 </body>
