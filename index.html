@@ -407,6 +407,12 @@ function renderForView(){
   const z=map.getZoom();
   if(activeLocation&&z>=10.8){addSelectedLocation();updateCrumbs();return}
   if(z<9.15){activeRegion=null;activeCity=null;addRegions();updateCrumbs();return}
+  if(activeRegion&&z<10.2){
+    activeCity=null;
+    addData(cities.filter(c=>activeRegion.cities.includes(c.name)),true);
+    updateCrumbs();
+    return;
+  }
   activeCity=null;
   scheduleViewportLocations();
   updateCrumbs();
