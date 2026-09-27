@@ -83,11 +83,12 @@
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
     @media(max-width:760px){
       header{flex:0 0 auto}
-      .header-inner{padding:8px 10px 9px;grid-template-columns:1fr;gap:7px}
+      .header-inner{padding:8px 10px 10px;grid-template-columns:1fr;gap:8px}
       .brand-row{gap:9px}.logo{width:34px;height:34px;border-radius:10px;font-size:12px}
       .title strong{font-size:14px}.title span{font-size:10px;margin-top:1px}
-      .filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:0 0 1px;scrollbar-width:none}
-      .filters::-webkit-scrollbar{display:none}.seg{padding:3px}.seg button{padding:7px 9px;font-size:10.5px}
+      .filters{display:grid;grid-template-columns:1fr;gap:6px;justify-content:stretch;overflow:visible;padding:0}
+      .filters::-webkit-scrollbar{display:none}.seg{padding:3px;width:100%;display:grid;grid-template-columns:1fr 1fr}.seg button{padding:7px 9px;font-size:10.5px;width:100%}
+      .source-seg{grid-template-columns:1fr 1fr}.source-seg button.active{background:var(--brand);color:#fff}
       .main{height:100%;min-height:0;overflow:hidden}
       .map-tools{left:10px;top:58px;width:min(330px,calc(100vw - 20px));gap:6px}.search-wrap{border-radius:13px}.search-input{padding:9px 6px;font-size:11px}.search-wrap svg{width:15px;height:15px}.crumbs{padding:4px 6px}.crumbs button{font-size:8.7px;max-width:102px}
       .map-tools.city-mode{width:auto}.map-tools.city-mode .search-wrap{width:44px;padding:0;justify-content:center}.map-tools.city-mode .search-input{display:none}
@@ -111,7 +112,7 @@
   <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg source-seg" aria-label="Datenebene"><button id="demoLayerBtn" class="active">SLS Demo</button><button id="borisLayerBtn">BORIS-NRW</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
-    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Testebene</b><br>Tippen Sie auf die Karte, um einen amtlichen Punktwert zu prüfen.</div>
+    <div id="borisNote" class="boris-note"><b>BORIS-NRW · amtliche Testebene</b><br>Aktuell werden noch keine flächendeckenden Preis-Pins geladen. Tippen Sie auf die Karte, um einen verfügbaren amtlichen Punktwert zu prüfen.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
