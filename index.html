@@ -286,6 +286,10 @@
       box-shadow:0 10px 24px rgba(11,17,18,.14)!important;
     }
 
+  
+    /* Calmer premium basemap treatment for the SLS website */
+    .leaflet-tile-pane{filter:saturate(.72) contrast(.92) brightness(1.035) sepia(.06)}
+
   </style>
 </head>
 <body>
@@ -431,7 +435,11 @@ const regions=[
   {name:'Münsterland',lat:51.95,lon:7.60,zoom:9.45,cities:['Ascheberg']}
 ];
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  maxZoom:20,
+  subdomains:'abcd',
+  attribution:'&copy; OpenStreetMap-Mitwirkende &copy; CARTO'
+}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
 let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,activeLocation=null,renderLevel='region',searchExpandedByUser=false,viewportSeq=0,viewportTimer=0;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
