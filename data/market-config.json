@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "pilotCities": ["Dorsten", "Recklinghausen", "Essen", "Dortmund"],
+  "propertyTypes": {
+    "wohnung": {"propstack_rs_type": "APARTMENT"},
+    "haus": {"propstack_rs_type": "HOUSE"}
+  },
+  "qualityRules": {
+    "minSoldForPublic": 5,
+    "highConfidenceSoldCount": 15,
+    "range": "p25_p75",
+    "typical": "median",
+    "minPricePerSqm": 250,
+    "maxPricePerSqm": 20000
+  },
+  "sourcePriority": ["propstack_sold", "external_transaction_data", "external_asking_data"],
+  "mixAskingAndSold": false
+}
