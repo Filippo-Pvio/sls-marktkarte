@@ -136,12 +136,27 @@ const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 const priceText=d=>currentMode==='spanne'?new Intl.NumberFormat('de-DE').format(d[currentType][0])+'–'+new Intl.NumberFormat('de-DE').format(d[currentType][1])+' €/m²':fmt(currentType==='wohnung'?d.typW:d.typH);
 const typical=d=>fmt(currentType==='wohnung'?d.typW:d.typH);
 function clearMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[]}
+function safeAnchor(lat,lon,width,height){
+  const p=map.latLngToContainerPoint([lat,lon]);
+  const mapW=map.getSize().x;
+  const pad=12;
+  let ax=width/2;
+  if(p.x-width/2<pad) ax=Math.max(10,p.x-pad);
+  if(p.x+width/2>mapW-pad) ax=Math.min(width-10,width-(mapW-pad-p.x));
+  return [ax,height/2];
+}
 function markerIcon(d,cityMode){
   const label=currentMode==='spanne'?Math.round(d[currentType][0]/100)*100+'–'+Math.round(d[currentType][1]/100)*100:new Intl.NumberFormat('de-DE').format(currentType==='wohnung'?d.typW:d.typH);
-  if(cityMode) return L.divIcon({className:'',html:'<div class="city-badge"><span class="dot"></span><span class="city-name">'+d.name+'</span><span class="city-price">'+label+' €</span></div>',iconSize:[176,34],iconAnchor:[88,17]});
+  if(cityMode){
+    const size=[176,34];
+    return L.divIcon({className:'',html:'<div class="city-badge"><span class="dot"></span><span class="city-name">'+d.name+'</span><span class="city-price">'+label+' €</span></div>',iconSize:size,iconAnchor:safeAnchor(d.lat,d.lon,size[0],size[1])});
+  }
   return L.divIcon({className:'',html:'<div class="price-pin"><small>'+d.name+'</small>'+label+' €</div>',iconSize:[0,0],iconAnchor:[0,0]})
 }
-function regionIcon(r){return L.divIcon({className:'',html:'<div class="region-pin"><strong>'+r.name+'</strong></div>',iconSize:[124,36],iconAnchor:[62,18]})}
+function regionIcon(r){
+  const size=[124,36];
+  return L.divIcon({className:'',html:'<div class="region-pin"><strong>'+r.name+'</strong></div>',iconSize:size,iconAnchor:safeAnchor(r.lat,r.lon,size[0],size[1])})
+}
 function addRegions(){clearMarkers();renderLevel='region';regions.forEach(r=>{const m=L.marker([r.lat,r.lon],{icon:regionIcon(r)}).addTo(map);m.on('click',()=>{activeRegion=r;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.7});setTimeout(renderForView,650)});markers.push(m)})}
 function visibleCityData(data){
   const z=map.getZoom();
@@ -188,7 +203,7 @@ function syncMapSize(){
 }
 function setInitialView(){
   if(window.matchMedia('(max-width:760px)').matches){
-    map.setView([51.52,7.18],7.72,{animate:false});
+    map.setView([51.54,6.98],7.72,{animate:false});
   }else{
     map.fitBounds(NRW_BOUNDS,{padding:[24,24],animate:false});
   }
