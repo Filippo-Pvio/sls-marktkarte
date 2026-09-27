@@ -34,7 +34,9 @@
     .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:650;padding:9px 12px;border-radius:999px;cursor:pointer;transition:.18s ease;white-space:nowrap}
     .seg button.active{background:white;color:var(--brand-dark);box-shadow:0 2px 12px rgba(25,50,56,.10)}
     .main{position:relative;min-width:0;min-height:0;width:100%;height:100%;overflow:hidden}#map{position:absolute;inset:0;width:100%!important;height:100%!important;min-width:100%;min-height:100%;background:#dfe9e7}.leaflet-container{width:100%!important;height:100%!important;overflow:hidden!important}
-    .map-tools{position:absolute;z-index:760;left:24px;top:24px;display:flex;flex-direction:column;gap:8px;width:min(420px,calc(100vw - 48px))}
+    .map-tools{position:absolute;z-index:760;left:24px;top:24px;display:flex;flex-direction:column;gap:8px;width:min(420px,calc(100vw - 48px));transition:.2s ease}
+    .map-tools.compact{width:auto}.map-tools.compact .search-wrap{width:48px;padding:0;justify-content:center;cursor:pointer}.map-tools.compact .search-input{display:none}.map-tools.compact .search-wrap svg{width:17px;height:17px}
+    .map-tools.hidden-for-panel{opacity:0;pointer-events:none;transform:translateY(-8px)}
     .search-wrap{position:relative;background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.9);border-radius:16px;box-shadow:0 10px 28px rgba(25,50,56,.13);display:flex;align-items:center;padding:0 12px}
     .search-wrap svg{width:18px;height:18px;flex:0 0 auto;color:var(--brand)}
     .search-input{width:100%;border:0;outline:0;background:transparent;padding:12px 8px;font:inherit;font-size:13px;color:var(--ink)}
@@ -42,8 +44,8 @@
     .search-results{display:none;background:white;border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
     .search-results.open{display:block}.search-result{width:100%;border:0;border-bottom:1px solid var(--line);background:white;text-align:left;padding:11px 13px;font:inherit;cursor:pointer}.search-result:last-child{border-bottom:0}
     .search-result strong{display:block;font-size:12px}.search-result span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
-    .crumbs{display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:rgba(255,255,255,.94);border-radius:999px;padding:6px 9px;width:max-content;max-width:100%;box-shadow:0 8px 22px rgba(25,50,56,.12)}
-    .crumbs button{border:0;background:transparent;color:var(--brand);font:inherit;font-size:10px;font-weight:800;padding:3px 4px;cursor:pointer}.crumbs i{font-style:normal;color:#9aa7a9;font-size:9px}.crumbs .current{color:var(--ink)}
+    .crumbs{display:flex;align-items:center;gap:3px;flex-wrap:nowrap;background:rgba(255,255,255,.94);border-radius:999px;padding:5px 7px;width:max-content;max-width:100%;box-shadow:0 8px 22px rgba(25,50,56,.12);overflow:hidden}
+    .crumbs button{border:0;background:transparent;color:var(--brand);font:inherit;font-size:9.5px;font-weight:800;padding:2px 3px;cursor:pointer;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}.crumbs i{font-style:normal;color:#9aa7a9;font-size:8px;flex:0 0 auto}.crumbs .current{color:var(--ink)}
     .intro-card{position:absolute;z-index:600;left:24px;top:24px;width:min(420px,calc(100vw - 48px));background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
     .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
     h1{font-size:26px;line-height:1.08;letter-spacing:-.045em;margin:0 0 9px}.intro-card p{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0}
@@ -73,8 +75,8 @@
     .quality{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.45}.quality b{color:var(--ink)}
     .cta{margin-top:16px;width:100%;border:0;border-radius:14px;padding:13px 16px;background:var(--brand);color:white;font:inherit;font-weight:800;cursor:pointer}
     .fine{margin-top:9px;font-size:10.5px;color:#809094;line-height:1.35}
-    .district-badge{display:flex;align-items:center;gap:6px;width:154px;min-height:31px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 9px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
-    .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:750;opacity:.82}.district-badge .district-price{margin-left:auto;white-space:nowrap;font-size:10px;font-weight:850}
+    .district-badge{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;width:182px;min-height:32px;background:rgba(14,91,98,.96);color:white;border:2px solid white;border-radius:999px;padding:6px 10px;box-shadow:0 8px 22px rgba(25,50,56,.22);overflow:hidden}
+    .district-badge .district-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;font-weight:760;opacity:.88}.district-badge .district-price{white-space:nowrap;font-size:10px;font-weight:850}
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
     @media(max-width:760px){
       header{flex:0 0 auto}
@@ -84,7 +86,8 @@
       .filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:0 0 1px;scrollbar-width:none}
       .filters::-webkit-scrollbar{display:none}.seg{padding:3px}.seg button{padding:7px 9px;font-size:10.5px}
       .main{height:100%;min-height:0;overflow:hidden}
-      .map-tools{left:10px;top:58px;width:min(330px,calc(100vw - 20px));gap:6px}.search-wrap{border-radius:13px}.search-input{padding:9px 6px;font-size:11px}.search-wrap svg{width:15px;height:15px}.crumbs{padding:5px 7px}.crumbs button{font-size:9px}
+      .map-tools{left:10px;top:58px;width:min(330px,calc(100vw - 20px));gap:6px}.search-wrap{border-radius:13px}.search-input{padding:9px 6px;font-size:11px}.search-wrap svg{width:15px;height:15px}.crumbs{padding:4px 6px}.crumbs button{font-size:8.7px;max-width:102px}
+      .map-tools.city-mode{width:auto}.map-tools.city-mode .search-wrap{width:44px;padding:0;justify-content:center}.map-tools.city-mode .search-input{display:none}
       .intro-card{left:10px;top:10px;width:min(320px,calc(100vw - 20px));padding:12px 40px 12px 13px;border-radius:15px;box-shadow:0 10px 28px rgba(25,50,56,.13)}
       .intro-card.compact{max-width:220px;padding:9px 36px 9px 11px}.intro-toggle{right:7px;top:7px;width:25px;height:25px;font-size:13px}
       .eyebrow{font-size:9px;margin-bottom:5px}.intro-card h1{font-size:17px;line-height:1.08;margin-bottom:6px}.intro-card p{font-size:10.5px;line-height:1.35}
@@ -96,7 +99,7 @@
       .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
       .region-pin{padding:9px 13px}.region-pin strong{font-size:11.5px}
       .city-badge{width:164px;min-height:32px;padding:6px 9px;gap:6px}.city-badge .city-name{font-size:9px}.city-badge .city-price{font-size:10px}
-      .district-badge{width:146px;min-height:30px;padding:6px 8px}.district-badge .district-name{font-size:8.5px}.district-badge .district-price{font-size:9.5px}
+      .district-badge{width:172px;min-height:30px;padding:6px 9px}.district-badge .district-name{font-size:8.8px}.district-badge .district-price{font-size:9.5px}
     }
   </style>
 </head>
@@ -226,7 +229,7 @@ function addData(data,cityMode=false){
   });
   clampAllMarkers();
 }
-function openPanel(d,kicker){document.getElementById('panelKicker').textContent=kicker;document.getElementById('panelTitle').textContent=d.name;document.getElementById('panelPrice').textContent=priceText(d);document.getElementById('panelTypical').textContent=typical(d);document.getElementById('panelType').innerHTML=(currentType==='wohnung'?'Eigentumswohnung':'Einfamilienhaus')+'<br>Bestand';document.getElementById('panel').classList.add('open')}
+function openPanel(d,kicker){document.getElementById('panelKicker').textContent=kicker;document.getElementById('panelTitle').textContent=d.name;document.getElementById('panelPrice').textContent=priceText(d);document.getElementById('panelTypical').textContent=typical(d);document.getElementById('panelType').innerHTML=(currentType==='wohnung'?'Eigentumswohnung':'Einfamilienhaus')+'<br>Bestand';document.getElementById('panel').classList.add('open');if(window.matchMedia('(max-width:760px)').matches)mapTools.classList.add('hidden-for-panel')}
 function nearestRegion(){const center=map.getCenter();return regions.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
 function nearestCity(){const center=map.getCenter();return cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
 function renderForView(){
@@ -251,6 +254,8 @@ function goRegion(r){activeRegion=r;activeCity=null;document.getElementById('pan
 function goCity(city){activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],detailMarkets[city.name]?12:11.4,{duration:.7});setTimeout(renderForView,650)}
 function updateCrumbs(){
   const el=document.getElementById('crumbs');
+  mapTools.classList.toggle('city-mode',!!activeCity);
+  if(!activeCity) mapTools.classList.remove('compact');
   let html='<button data-nav="nrw">NRW</button>';
   if(activeRegion) html+='<i>›</i><button data-nav="region">'+activeRegion.name+'</button>';
   if(activeCity) html+='<i>›</i><button class="current" data-nav="city">'+activeCity.name+'</button>';
@@ -259,7 +264,7 @@ function updateCrumbs(){
   const rb=el.querySelector('[data-nav="region"]');if(rb) rb.onclick=()=>goRegion(activeRegion);
   const cb=el.querySelector('[data-nav="city"]');if(cb) cb.onclick=()=>goCity(activeCity);
 }
-const marketSearch=document.getElementById('marketSearch'),searchResults=document.getElementById('searchResults');
+const marketSearch=document.getElementById('marketSearch'),searchResults=document.getElementById('searchResults'),mapTools=document.querySelector('.map-tools');
 function runSearch(){
   const q=marketSearch.value.trim().toLowerCase();
   if(!q){searchResults.classList.remove('open');searchResults.innerHTML='';return}
@@ -268,6 +273,8 @@ function runSearch(){
   searchResults.classList.add('open');
   matches.forEach((city,i)=>{const b=searchResults.querySelector('[data-i="'+i+'"]');if(b)b.onclick=()=>{marketSearch.value=city.name;searchResults.classList.remove('open');goCity(city)}})
 }
+document.querySelector('.search-wrap').addEventListener('click',()=>{if(mapTools.classList.contains('city-mode')){mapTools.classList.remove('city-mode');setTimeout(()=>marketSearch.focus(),40)}});
+marketSearch.addEventListener('blur',()=>{setTimeout(()=>{if(activeCity&&!searchResults.classList.contains('open'))mapTools.classList.add('city-mode')},120)});
 marketSearch.addEventListener('input',runSearch);
 marketSearch.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=marketSearch.value.trim().toLowerCase();const city=cities.find(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q));if(city){searchResults.classList.remove('open');goCity(city)}}});
 addRegions();updateCrumbs();
@@ -300,7 +307,7 @@ let renderTimer;
 map.on('zoomend moveend',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(()=>{renderForView();setTimeout(clampAllMarkers,40)},80)});
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-type]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;update();document.getElementById('panel').classList.remove('open')}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentMode=b.dataset.mode;update();document.getElementById('panel').classList.remove('open')}));
-document.getElementById('panelClose').onclick=()=>document.getElementById('panel').classList.remove('open');
+document.getElementById('panelClose').onclick=()=>{document.getElementById('panel').classList.remove('open');mapTools.classList.remove('hidden-for-panel');updateCrumbs()};
 const intro=document.getElementById('intro'), introToggle=document.getElementById('introToggle');
 function setIntroCompact(compact){intro.classList.toggle('compact',compact);introToggle.textContent=compact?'+':'−';setTimeout(syncMapSize,50)}
 introToggle.onclick=()=>setIntroCompact(!intro.classList.contains('compact'));
