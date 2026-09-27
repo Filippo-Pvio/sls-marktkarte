@@ -291,7 +291,7 @@
     .leaflet-tile-pane{filter:grayscale(.72) saturate(.38) brightness(1.12) contrast(.82) sepia(.10);opacity:.88}
 
   
-    .google-basemap{position:absolute;inset:0;width:100%;height:100%;background:#fff9f3}
+    .google-basemap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:#fff9f3;z-index:1}
     .google-basemap>div{width:100%!important;height:100%!important}
     .leaflet-tile-pane:has(.google-basemap){filter:none!important;opacity:1!important}
 
@@ -459,6 +459,10 @@ function loadGoogleBasemap(){
       onAdd(m){
         this._map=m;
         this._container=L.DomUtil.create('div','google-basemap');
+        this._container.style.position='absolute';
+        this._container.style.inset='0';
+        this._container.style.width='100%';
+        this._container.style.height='100%';
         this.getPane().appendChild(this._container);
         this._gmap=new google.maps.Map(this._container,{
           center:{lat:m.getCenter().lat,lng:m.getCenter().lng},
@@ -489,6 +493,7 @@ function loadGoogleBasemap(){
     const googleLayer=new GoogleMutant({pane:'tilePane'});
     map.removeLayer(baseLayer);
     baseLayer=googleLayer.addTo(map);
+    setTimeout(()=>map.invalidateSize(false),50);
   };
   script.onerror=()=>{};
   document.head.appendChild(script);
