@@ -39,6 +39,11 @@
     h1{font-size:26px;line-height:1.08;letter-spacing:-.045em;margin:0 0 9px}.intro-card p{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0}
     .legend{display:flex;align-items:center;gap:8px;margin-top:15px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
     .legend i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;box-shadow:0 0 0 5px rgba(216,180,108,.15)}
+    .intro-toggle{position:absolute;right:12px;top:12px;width:30px;height:30px;border:0;border-radius:50%;background:#eef3f3;color:var(--brand-dark);font-weight:800;cursor:pointer}
+    .intro-card.compact{width:auto;max-width:min(330px,calc(100vw - 48px));padding:13px 44px 13px 15px}
+    .intro-card.compact p,.intro-card.compact .legend{display:none}.intro-card.compact .eyebrow{margin-bottom:3px}.intro-card.compact h1{font-size:17px;margin:0;white-space:nowrap}
+    .region-pin{position:relative;transform:translate(-50%,-50%);min-width:118px;background:rgba(14,91,98,.94);color:#fff;border:2px solid rgba(255,255,255,.95);border-radius:999px;padding:10px 14px;box-shadow:0 10px 26px rgba(14,91,98,.24);text-align:center;white-space:nowrap}
+    .region-pin strong{display:block;font-size:13px;line-height:1.05}.region-pin span{display:block;font-size:9px;opacity:.78;margin-top:3px;font-weight:650}
     .demo{position:absolute;z-index:650;right:18px;bottom:18px;background:rgba(24,50,56,.92);color:white;border-radius:12px;padding:10px 12px;font-size:11px;line-height:1.3;box-shadow:0 10px 30px rgba(0,0,0,.16)}
     .demo strong{display:block;margin-bottom:2px}
     .panel{position:absolute;z-index:800;right:24px;top:24px;width:min(390px,calc(100vw - 48px));background:white;border-radius:22px;box-shadow:var(--shadow);overflow:hidden;transform:translateX(calc(100% + 50px));opacity:0;transition:.28s cubic-bezier(.2,.8,.2,1)}
@@ -64,7 +69,8 @@
       .filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:0 0 1px;scrollbar-width:none}
       .filters::-webkit-scrollbar{display:none}.seg{padding:3px}.seg button{padding:7px 9px;font-size:10.5px}
       .main{height:100%;min-height:0;overflow:hidden}
-      .intro-card{left:10px;top:10px;width:min(320px,calc(100vw - 20px));padding:12px 13px;border-radius:15px;box-shadow:0 10px 28px rgba(25,50,56,.13)}
+      .intro-card{left:10px;top:10px;width:min(320px,calc(100vw - 20px));padding:12px 40px 12px 13px;border-radius:15px;box-shadow:0 10px 28px rgba(25,50,56,.13)}
+      .intro-card.compact{max-width:calc(100vw - 20px);padding:10px 38px 10px 12px}.intro-card.compact h1{font-size:14px;white-space:normal}.intro-toggle{right:8px;top:8px;width:27px;height:27px}
       .eyebrow{font-size:9px;margin-bottom:5px}.intro-card h1{font-size:17px;line-height:1.08;margin-bottom:6px}.intro-card p{font-size:10.5px;line-height:1.35}
       .legend{margin-top:8px;padding-top:8px;font-size:9.5px;line-height:1.25}.legend i{width:6px;height:6px;box-shadow:0 0 0 4px rgba(216,180,108,.15)}
       .panel{left:10px;right:10px;top:auto;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:62vh;overflow:auto;border-radius:18px;transform:translateY(calc(100% + 40px))}
@@ -80,7 +86,7 @@
   <header><div class="header-inner"><div class="brand-row"><div class="logo">SLS</div><div class="title"><strong>Immobilienmarkt NRW</strong><span>Interaktiver Prototyp · noch keine Live-Marktdaten</span></div></div><div class="filters"><div class="seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Preisspanne</button><button data-mode="mittel">Typischer Wert</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
-    <section class="intro-card" id="intro"><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Zoomen Sie von Nordrhein-Westfalen in einzelne Städte und Teilmärkte. Die Architektur ist bereits auf ganz NRW ausgelegt.</p><div class="legend"><i></i><span>Für den Prototyp verwenden wir bewusst gekennzeichnete Demo-Werte.</span></div></section>
+    <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">SLS Marktkarte</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Starten Sie mit einer Region, zoomen Sie in eine Stadt und anschließend in den passenden Teilmarkt.</p><div class="legend"><i></i><span>Für den Prototyp verwenden wir bewusst gekennzeichnete Demo-Werte.</span></div></section>
     <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality"><b>Datenqualität im späteren Live-Betrieb:</b> externe Marktdaten + regionale Vergleichsdaten + SLS-Transaktionsdaten, gewichtet nach Datenmenge und Aktualität.</div><button class="cta" id="cta">Was ist meine Immobilie wert?</button><div class="fine">Prototyp: Werte dienen nur der UI-/Funktionsprüfung und dürfen nicht als Marktwerte veröffentlicht werden.</div></div></aside>
     <div class="demo"><strong>TESTVERSION</strong>Keine Veröffentlichung auf sls.de</div>
   </main>
@@ -107,19 +113,43 @@ const detailMarkets={
 'Bochum':[{name:'Wiemelhausen',lat:51.457,lon:7.235,wohnung:[2750,3450],haus:[3200,4300],typW:3080,typH:3740},{name:'Stiepel',lat:51.429,lon:7.229,wohnung:[3050,3900],haus:[3600,4850],typW:3470,typH:4210},{name:'Wattenscheid',lat:51.481,lon:7.133,wohnung:[2100,2800],haus:[2500,3400],typW:2460,typH:2960}],
 'Dortmund':[{name:'Kreuzviertel',lat:51.504,lon:7.448,wohnung:[3300,4200],haus:[3900,5200],typW:3720,typH:4520},{name:'Hombruch',lat:51.475,lon:7.443,wohnung:[2750,3500],haus:[3250,4300],typW:3110,typH:3760},{name:'Aplerbeck',lat:51.489,lon:7.555,wohnung:[2500,3250],haus:[3000,3950],typW:2860,typH:3480}]
 };
-const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:16,preferCanvas:true}).setView([51.45,7.15],8);
+const NRW_BOUNDS=L.latLngBounds([[50.30,5.75],[52.60,9.55]]);
+const regions=[
+  {name:'Ruhrgebiet',lat:51.51,lon:7.18,zoom:9.35,cities:['Dorsten','Recklinghausen','Essen','Bochum','Dortmund','Herne','Schermbeck']},
+  {name:'Rheinland',lat:51.12,lon:6.88,zoom:9.25,cities:['Düsseldorf','Leverkusen']},
+  {name:'Niederrhein',lat:51.31,lon:6.30,zoom:9.35,cities:['Nettetal']},
+  {name:'Münsterland',lat:51.82,lon:7.55,zoom:9.35,cities:['Ascheberg']}
+];
+const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
-let currentType='wohnung',currentMode='spanne',markers=[];
+let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,renderLevel='region';
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 const priceText=d=>currentMode==='spanne'?new Intl.NumberFormat('de-DE').format(d[currentType][0])+'–'+new Intl.NumberFormat('de-DE').format(d[currentType][1])+' €/m²':fmt(currentType==='wohnung'?d.typW:d.typH);
 const typical=d=>fmt(currentType==='wohnung'?d.typW:d.typH);
 function clearMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[]}
 function markerIcon(d,cityMode){const label=currentMode==='spanne'?Math.round(d[currentType][0]/100)*100+'–'+Math.round(d[currentType][1]/100)*100:new Intl.NumberFormat('de-DE').format(currentType==='wohnung'?d.typW:d.typH);return L.divIcon({className:'',html:'<div class="price-pin '+(cityMode?'city':'')+'"><small>'+d.name+'</small>'+label+' €</div>',iconSize:[0,0],iconAnchor:[0,0]})}
-function addData(data,cityMode=false){clearMarkers();data.forEach(d=>{const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,cityMode)}).addTo(map);m.on('click',()=>{if(cityMode&&detailMarkets[d.name]){map.flyTo([d.lat,d.lon],12,{duration:.8});setTimeout(()=>addData(detailMarkets[d.name],false),700)}openPanel(d,cityMode?'Marktregion':'Teilmarkt')});markers.push(m)})}
+function regionIcon(r){return L.divIcon({className:'',html:'<div class="region-pin"><strong>'+r.name+'</strong><span>'+r.cities.length+' Marktorte</span></div>',iconSize:[0,0],iconAnchor:[0,0]})}
+function addRegions(){clearMarkers();renderLevel='region';regions.forEach(r=>{const m=L.marker([r.lat,r.lon],{icon:regionIcon(r)}).addTo(map);m.on('click',()=>{activeRegion=r;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.7});setTimeout(renderForView,650)});markers.push(m)})}
+function addData(data,cityMode=false){clearMarkers();renderLevel=cityMode?'city':'detail';data.forEach(d=>{const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,cityMode)}).addTo(map);m.on('click',()=>{if(cityMode&&detailMarkets[d.name]){map.flyTo([d.lat,d.lon],12,{duration:.8});setTimeout(()=>addData(detailMarkets[d.name],false),700)}openPanel(d,cityMode?'Marktregion':'Teilmarkt')});markers.push(m)})}
 function openPanel(d,kicker){document.getElementById('panelKicker').textContent=kicker;document.getElementById('panelTitle').textContent=d.name;document.getElementById('panelPrice').textContent=priceText(d);document.getElementById('panelTypical').textContent=typical(d);document.getElementById('panelType').innerHTML=(currentType==='wohnung'?'Eigentumswohnung':'Einfamilienhaus')+'<br>Bestand';document.getElementById('panel').classList.add('open')}
-function update(){const z=map.getZoom(),center=map.getCenter(),nearest=cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0];if(z>=11&&detailMarkets[nearest.name])addData(detailMarkets[nearest.name],false);else addData(cities,true)}
-addData(cities,true);
+function nearestRegion(){const center=map.getCenter();return regions.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
+function nearestCity(){const center=map.getCenter();return cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
+function renderForView(){
+  const z=map.getZoom();
+  if(z<8.8){activeRegion=null;addRegions();return}
+  if(z<10.8){
+    const r=activeRegion||nearestRegion();
+    activeRegion=r;
+    addData(cities.filter(c=>r.cities.includes(c.name)),true);
+    return
+  }
+  const city=nearestCity();
+  if(detailMarkets[city.name]) addData(detailMarkets[city.name],false);
+  else addData([city],true);
+}
+function update(){renderForView()}
+addRegions();
 
 function syncMapSize(){
   requestAnimationFrame(()=>{
@@ -138,10 +168,16 @@ if('ResizeObserver' in window){
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden) setTimeout(syncMapSize,80)});
 
-map.on('zoomend moveend',()=>{if(map.getZoom()<10.5)addData(cities,true);else{const center=map.getCenter(),nearest=cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0];if(detailMarkets[nearest.name])addData(detailMarkets[nearest.name],false)}});
+let renderTimer;
+map.on('zoomend moveend',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(renderForView,80)});
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-type]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;update();document.getElementById('panel').classList.remove('open')}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentMode=b.dataset.mode;update();document.getElementById('panel').classList.remove('open')}));
 document.getElementById('panelClose').onclick=()=>document.getElementById('panel').classList.remove('open');
+const intro=document.getElementById('intro'), introToggle=document.getElementById('introToggle');
+function setIntroCompact(compact){intro.classList.toggle('compact',compact);introToggle.textContent=compact?'+':'−';setTimeout(syncMapSize,50)}
+introToggle.onclick=()=>setIntroCompact(!intro.classList.contains('compact'));
+if(window.matchMedia('(max-width:760px)').matches){setIntroCompact(true)}
+map.on('dragstart zoomstart',()=>{if(window.matchMedia('(max-width:760px)').matches)setIntroCompact(true)});
 document.getElementById('cta').onclick=()=>alert('Im nächsten Schritt würde hier die Adress- und Bewertungsstrecke starten.');
 </script>
 </body>
