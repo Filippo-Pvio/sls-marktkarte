@@ -10,8 +10,8 @@
   <style>
     :root {--ink:#183238;--muted:#63767a;--brand:#0e5b62;--brand-dark:#0a464c;--brand-soft:#e9f1f2;--accent:#d8b46c;--paper:#f7f8f6;--white:#fff;--line:#dfe7e7;--shadow:0 18px 50px rgba(25,50,56,.16)}
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
-    body{overflow:hidden}.app{height:100%;display:grid;grid-template-rows:auto 1fr}
+    html,body{width:100%;height:100%;min-height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+    body{position:fixed;inset:0;overscroll-behavior:none}.app{width:100vw;height:100vh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
     header{position:relative;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
     .header-inner{max-width:1540px;margin:auto;padding:18px 24px 14px;display:grid;grid-template-columns:minmax(250px,1fr) auto;gap:18px;align-items:center}
     .brand-row{display:flex;align-items:center;gap:14px;min-width:0}
@@ -20,7 +20,7 @@
     .filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.seg{background:#eef3f3;border:1px solid var(--line);border-radius:999px;padding:4px;display:flex;gap:3px}
     .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:650;padding:9px 12px;border-radius:999px;cursor:pointer;transition:.18s ease;white-space:nowrap}
     .seg button.active{background:white;color:var(--brand-dark);box-shadow:0 2px 12px rgba(25,50,56,.10)}
-    .main{position:relative;min-height:0}#map{width:100%;height:100%;background:#dfe9e7}
+    .main{position:relative;min-width:0;min-height:0;width:100%;height:100%;overflow:hidden}#map{position:absolute;inset:0;width:100%!important;height:100%!important;min-width:100%;min-height:100%;background:#dfe9e7}.leaflet-container{width:100%!important;height:100%!important;overflow:hidden!important}
     .intro-card{position:absolute;z-index:600;left:24px;top:24px;width:min(420px,calc(100vw - 48px));background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
     .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
     h1{font-size:26px;line-height:1.08;letter-spacing:-.045em;margin:0 0 9px}.intro-card p{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0}
@@ -43,7 +43,23 @@
     .price-pin::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:var(--brand);border-right:3px solid #fff;border-bottom:3px solid #fff}
     .price-pin small{display:block;font-size:9px;font-weight:650;opacity:.8;margin-bottom:3px}.price-pin.city{background:#fff;color:var(--brand-dark);border-color:var(--brand);padding:9px 12px}.price-pin.city::after{background:white;border-color:var(--brand)}
     .leaflet-control-zoom{border:none!important;box-shadow:0 8px 22px rgba(25,50,56,.16)!important}.leaflet-control-zoom a{border:none!important;color:var(--brand)!important}.leaflet-control-attribution{font-size:9px!important}
-    @media(max-width:760px){.header-inner{padding:12px 14px;grid-template-columns:1fr;gap:10px}.filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.main{min-height:0}.intro-card{left:14px;top:14px;width:calc(100vw - 28px);padding:16px 17px;border-radius:17px}.intro-card h1{font-size:21px}.intro-card p{font-size:12.5px}.legend{margin-top:11px;padding-top:10px}.panel{left:14px;right:14px;top:auto;bottom:14px;width:auto;max-height:64vh;overflow:auto;transform:translateY(calc(100% + 40px))}.panel.open{transform:none}.demo{display:none}.title strong{font-size:16px}.logo{width:38px;height:38px}.seg button{padding:8px 10px;font-size:12px}}
+    @media(max-width:760px){
+      header{flex:0 0 auto}
+      .header-inner{padding:8px 10px 9px;grid-template-columns:1fr;gap:7px}
+      .brand-row{gap:9px}.logo{width:34px;height:34px;border-radius:10px;font-size:12px}
+      .title strong{font-size:14px}.title span{font-size:10px;margin-top:1px}
+      .filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:0 0 1px;scrollbar-width:none}
+      .filters::-webkit-scrollbar{display:none}.seg{padding:3px}.seg button{padding:7px 9px;font-size:10.5px}
+      .main{height:100%;min-height:0;overflow:hidden}
+      .intro-card{left:10px;top:10px;width:min(320px,calc(100vw - 20px));padding:12px 13px;border-radius:15px;box-shadow:0 10px 28px rgba(25,50,56,.13)}
+      .eyebrow{font-size:9px;margin-bottom:5px}.intro-card h1{font-size:17px;line-height:1.08;margin-bottom:6px}.intro-card p{font-size:10.5px;line-height:1.35}
+      .legend{margin-top:8px;padding-top:8px;font-size:9.5px;line-height:1.25}.legend i{width:6px;height:6px;box-shadow:0 0 0 4px rgba(216,180,108,.15)}
+      .panel{left:10px;right:10px;top:auto;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-height:62vh;overflow:auto;border-radius:18px;transform:translateY(calc(100% + 40px))}
+      .panel.open{transform:none}.panel-head{padding:14px 16px}.panel-title{font-size:20px}.panel-body{padding:14px 16px 16px}.metric .value{font-size:24px}
+      .demo{display:none}
+      .leaflet-control-zoom{margin-left:10px!important;margin-bottom:max(10px,env(safe-area-inset-bottom))!important}
+      .leaflet-control-attribution{max-width:70vw;white-space:normal;line-height:1.1}
+    }
   </style>
 </head>
 <body>
@@ -78,7 +94,7 @@ const detailMarkets={
 'Bochum':[{name:'Wiemelhausen',lat:51.457,lon:7.235,wohnung:[2750,3450],haus:[3200,4300],typW:3080,typH:3740},{name:'Stiepel',lat:51.429,lon:7.229,wohnung:[3050,3900],haus:[3600,4850],typW:3470,typH:4210},{name:'Wattenscheid',lat:51.481,lon:7.133,wohnung:[2100,2800],haus:[2500,3400],typW:2460,typH:2960}],
 'Dortmund':[{name:'Kreuzviertel',lat:51.504,lon:7.448,wohnung:[3300,4200],haus:[3900,5200],typW:3720,typH:4520},{name:'Hombruch',lat:51.475,lon:7.443,wohnung:[2750,3500],haus:[3250,4300],typW:3110,typH:3760},{name:'Aplerbeck',lat:51.489,lon:7.555,wohnung:[2500,3250],haus:[3000,3950],typW:2860,typH:3480}]
 };
-const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:16}).setView([51.45,7.15],8);
+const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:16,preferCanvas:true}).setView([51.45,7.15],8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
 let currentType='wohnung',currentMode='spanne',markers=[];
@@ -91,6 +107,24 @@ function addData(data,cityMode=false){clearMarkers();data.forEach(d=>{const m=L.
 function openPanel(d,kicker){document.getElementById('panelKicker').textContent=kicker;document.getElementById('panelTitle').textContent=d.name;document.getElementById('panelPrice').textContent=priceText(d);document.getElementById('panelTypical').textContent=typical(d);document.getElementById('panelType').innerHTML=(currentType==='wohnung'?'Eigentumswohnung':'Einfamilienhaus')+'<br>Bestand';document.getElementById('panel').classList.add('open')}
 function update(){const z=map.getZoom(),center=map.getCenter(),nearest=cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0];if(z>=11&&detailMarkets[nearest.name])addData(detailMarkets[nearest.name],false);else addData(cities,true)}
 addData(cities,true);
+
+function syncMapSize(){
+  requestAnimationFrame(()=>{
+    map.invalidateSize({pan:false,animate:false});
+  });
+}
+window.addEventListener('load',()=>{syncMapSize();setTimeout(syncMapSize,120);setTimeout(syncMapSize,500)});
+window.addEventListener('resize',syncMapSize);
+window.addEventListener('orientationchange',()=>setTimeout(syncMapSize,250));
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',syncMapSize);
+}
+if('ResizeObserver' in window){
+  const ro=new ResizeObserver(syncMapSize);
+  ro.observe(document.querySelector('.main'));
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden) setTimeout(syncMapSize,80)});
+
 map.on('zoomend moveend',()=>{if(map.getZoom()<10.5)addData(cities,true);else{const center=map.getCenter(),nearest=cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0];if(detailMarkets[nearest.name])addData(detailMarkets[nearest.name],false)}});
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-type]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;update();document.getElementById('panel').classList.remove('open')}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentMode=b.dataset.mode;update();document.getElementById('panel').classList.remove('open')}));
