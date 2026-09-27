@@ -153,7 +153,7 @@ const regions=[
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-Mitwirkende'}).addTo(map);
 map.zoomControl.setPosition('bottomleft');
-let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region';
+let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,renderLevel='region',searchExpandedByUser=false;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 const priceText=d=>currentMode==='spanne'?new Intl.NumberFormat('de-DE').format(d[currentType][0])+'–'+new Intl.NumberFormat('de-DE').format(d[currentType][1])+' €/m²':fmt(currentType==='wohnung'?d.typW:d.typH);
 const typical=d=>fmt(currentType==='wohnung'?d.typW:d.typH);
@@ -249,12 +249,12 @@ function renderForView(){
   updateCrumbs();
 }
 function update(){renderForView()}
-function goNRW(){activeRegion=null;activeCity=null;document.getElementById('panel').classList.remove('open');setInitialView();setTimeout(renderForView,80)}
-function goRegion(r){activeRegion=r;activeCity=null;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.65});setTimeout(renderForView,600)}
-function goCity(city){activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],detailMarkets[city.name]?12:11.4,{duration:.7});setTimeout(renderForView,650)}
+function goNRW(){activeRegion=null;activeCity=null;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');setInitialView();setTimeout(renderForView,80)}
+function goRegion(r){activeRegion=r;activeCity=null;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.65});setTimeout(renderForView,600)}
+function goCity(city){activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],detailMarkets[city.name]?12:11.4,{duration:.7});setTimeout(renderForView,650)}
 function updateCrumbs(){
   const el=document.getElementById('crumbs');
-  mapTools.classList.toggle('city-mode',!!activeCity);
+  mapTools.classList.toggle('city-mode',!!activeCity&&!searchExpandedByUser);
   if(!activeCity) mapTools.classList.remove('compact');
   let html='<button data-nav="nrw">NRW</button>';
   if(activeRegion) html+='<i>›</i><button data-nav="region">'+activeRegion.name+'</button>';
@@ -273,8 +273,8 @@ function runSearch(){
   searchResults.classList.add('open');
   matches.forEach((city,i)=>{const b=searchResults.querySelector('[data-i="'+i+'"]');if(b)b.onclick=()=>{marketSearch.value=city.name;searchResults.classList.remove('open');goCity(city)}})
 }
-document.querySelector('.search-wrap').addEventListener('click',()=>{if(mapTools.classList.contains('city-mode')){mapTools.classList.remove('city-mode');setTimeout(()=>marketSearch.focus(),40)}});
-marketSearch.addEventListener('blur',()=>{setTimeout(()=>{if(activeCity&&!searchResults.classList.contains('open'))mapTools.classList.add('city-mode')},120)});
+document.querySelector('.search-wrap').addEventListener('click',()=>{if(mapTools.classList.contains('city-mode')){searchExpandedByUser=true;mapTools.classList.remove('city-mode');setTimeout(()=>marketSearch.focus(),40)}});
+marketSearch.addEventListener('blur',()=>{setTimeout(()=>{if(activeCity&&!searchExpandedByUser&&!searchResults.classList.contains('open'))mapTools.classList.add('city-mode')},120)});
 marketSearch.addEventListener('input',runSearch);
 marketSearch.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=marketSearch.value.trim().toLowerCase();const city=cities.find(c=>c.name.toLowerCase().includes(q)||(c.plz||'').startsWith(q));if(city){searchResults.classList.remove('open');goCity(city)}}});
 addRegions();updateCrumbs();
@@ -307,7 +307,7 @@ let renderTimer;
 map.on('zoomend moveend',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(()=>{renderForView();setTimeout(clampAllMarkers,40)},80)});
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-type]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentType=b.dataset.type;update();document.getElementById('panel').classList.remove('open')}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentMode=b.dataset.mode;update();document.getElementById('panel').classList.remove('open')}));
-document.getElementById('panelClose').onclick=()=>{document.getElementById('panel').classList.remove('open');mapTools.classList.remove('hidden-for-panel');updateCrumbs()};
+document.getElementById('panelClose').onclick=()=>{document.getElementById('panel').classList.remove('open');mapTools.classList.remove('hidden-for-panel');searchExpandedByUser=true;updateCrumbs();mapTools.classList.remove('city-mode')};
 const intro=document.getElementById('intro'), introToggle=document.getElementById('introToggle');
 function setIntroCompact(compact){intro.classList.toggle('compact',compact);introToggle.textContent=compact?'+':'−';setTimeout(syncMapSize,50)}
 introToggle.onclick=()=>setIntroCompact(!intro.classList.contains('compact'));
