@@ -9,8 +9,8 @@ export default async function handler(req,res){
   const radiusKm=Math.min(50,Math.max(5,Math.hypot((north-south)*111,(east-west)*70)/2));
   const limit=zoom>=11?80:zoom>=9.5?45:24;
   try{
-    const p=new URLSearchParams({latitude:String(centerLat),longitude:String(centerLon),radius:String(Math.ceil(radiusKm)),page:'1',pageSize:'100'});
-    const r=await fetch(OPENPLZ+'?'+p.toString(),{headers:{Accept:'application/json'}});
+    const p=new URLSearchParams({page:'1',pageSize:'100',federalStateKey:'05'});
+    const r=await fetch(OPENPLZ+'?'+p.toString(),{headers:{Accept:'application/json','User-Agent':'SLS-Marktkarte/1.0'}});
     if(!r.ok) throw new Error('OpenPLZ '+r.status);
     const a=await r.json();
     const seen=new Set(),rows=[];
