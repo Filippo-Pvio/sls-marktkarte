@@ -290,7 +290,12 @@
     /* Calmer premium basemap treatment for the SLS website */
     .leaflet-tile-pane{filter:grayscale(.72) saturate(.38) brightness(1.12) contrast(.82) sepia(.10);opacity:.88}
 
-  </style>
+  
+    .google-basemap{position:absolute;inset:0;width:100%;height:100%;background:#fff9f3}
+    .google-basemap>div{width:100%!important;height:100%!important}
+    .leaflet-tile-pane:has(.google-basemap){filter:none!important;opacity:1!important}
+
+</style>
 </head>
 <body>
 <div class="app">
@@ -435,10 +440,60 @@ const regions=[
   {name:'Münsterland',lat:51.95,lon:7.60,zoom:9.45,cities:['Ascheberg']}
 ];
 const map=L.map('map',{zoomControl:true,attributionControl:true,minZoom:6.8,maxZoom:16,preferCanvas:true,maxBoundsViscosity:.3}).fitBounds(NRW_BOUNDS,{padding:[18,18]});
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+const GOOGLE_MAPS_BROWSER_KEY='__GOOGLE_MAPS_BROWSER_KEY__';
+const osmBase=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:19,
   attribution:'&copy; OpenStreetMap-Mitwirkende'
-}).addTo(map);
+});
+let baseLayer=osmBase.addTo(map);
+
+function loadGoogleBasemap(){
+  if(!GOOGLE_MAPS_BROWSER_KEY) return;
+  const script=document.createElement('script');
+  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_BROWSER_KEY);
+  script.async=true;
+  script.defer=true;
+  script.onload=()=>{
+    if(!window.google?.maps) return;
+    class GoogleMutant extends L.GridLayer{
+      onAdd(m){
+        this._map=m;
+        this._container=L.DomUtil.create('div','google-basemap');
+        this.getPane().appendChild(this._container);
+        this._gmap=new google.maps.Map(this._container,{
+          center:{lat:m.getCenter().lat,lng:m.getCenter().lng},
+          zoom:Math.round(m.getZoom()),
+          disableDefaultUI:true,
+          clickableIcons:false,
+          gestureHandling:'none',
+          keyboardShortcuts:false,
+          mapTypeId:'roadmap',
+          styles:[
+            {elementType:'geometry',stylers:[{color:'#f7f5f1'}]},
+            {elementType:'labels.text.fill',stylers:[{color:'#5f5d5b'}]},
+            {elementType:'labels.text.stroke',stylers:[{color:'#fff9f3'}]},
+            {featureType:'road',elementType:'geometry',stylers:[{color:'#ffffff'}]},
+            {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#e5e1db'}]},
+            {featureType:'water',elementType:'geometry',stylers:[{color:'#d9e6ea'}]},
+            {featureType:'poi',elementType:'geometry',stylers:[{color:'#edf0e9'}]},
+            {featureType:'transit',stylers:[{visibility:'off'}]}
+          ]
+        });
+        this._sync=()=>this._gmap?.setOptions({center:{lat:m.getCenter().lat,lng:m.getCenter().lng},zoom:Math.round(m.getZoom())});
+        m.on('move zoom resize',this._sync);
+        setTimeout(()=>{google.maps.event.trigger(this._gmap,'resize');this._sync();},0);
+      }
+      onRemove(m){m.off('move zoom resize',this._sync);this._container?.remove();}
+      createTile(){return document.createElement('div');}
+    }
+    const googleLayer=new GoogleMutant({pane:'tilePane'});
+    map.removeLayer(baseLayer);
+    baseLayer=googleLayer.addTo(map);
+  };
+  script.onerror=()=>{};
+  document.head.appendChild(script);
+}
+loadGoogleBasemap();
 map.zoomControl.setPosition('bottomleft');
 let currentType='wohnung',currentMode='spanne',markers=[],activeRegion=null,activeCity=null,activeLocation=null,renderLevel='region',searchExpandedByUser=false,viewportSeq=0,viewportTimer=0;
 const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
