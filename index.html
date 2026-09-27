@@ -323,6 +323,12 @@ function clampAllMarkers(){
 }
 function markerIcon(d,cityMode){
   const s=sourceDatum(d);
+  if((dataSource==='snapshot'||dataSource==='sls')&&!s){
+    const size=cityMode?[176,34]:[154,31];
+    const cls=cityMode?'city-badge':'district-badge';
+    const nameCls=cityMode?'city-name':'district-name';
+    return L.divIcon({className:'',html:'<div class="'+cls+'" style="opacity:.72;border-color:#a8b7b9"><span class="'+nameCls+'">'+d.name+'</span><span style="margin-left:auto;font-size:9px">keine Daten</span></div>',iconSize:size,iconAnchor:[size[0]/2,size[1]/2]});
+  }
   let label;
   if(dataSource==='snapshot') label=s?(currentMode==='spanne'?Math.round(s.range[0]/100)*100+'–'+Math.round(s.range[1]/100)*100:new Intl.NumberFormat('de-DE').format(s.typ)):'–';
   else if(dataSource==='sls') label=s?(currentMode==='spanne'?Math.round(s.low/100)*100+'–'+Math.round(s.high/100)*100:new Intl.NumberFormat('de-DE').format(s.typical)):'–';
@@ -356,11 +362,11 @@ function visibleCityData(data){
 }
 function addData(data,cityMode=false){
   clearMarkers();renderLevel=cityMode?'city':'detail';
-  if(dataSource==='sls' && data.some(d=>d.plz && !slsCache.has(slsKey(d)))){warmSlsData(data);return;}
+  if(dataSource==='sls' && data.some(d=>d.plz && !slsCache.has(slsKey(d)))) warmSlsData(data);
   let shown=cityMode?visibleCityData(data):data;
-  if(dataSource==='snapshot'||dataSource==='sls'){
-    shown=shown.filter(d=>!!sourceDatum(d));
-  }
+  const priced=shown.filter(d=>!!sourceDatum(d));
+  const unpriced=shown.filter(d=>!sourceDatum(d));
+  shown=priced.concat(unpriced);
   shown.forEach(d=>{
     const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,cityMode),riseOnHover:true}).addTo(map);
     m.on('click',()=>{
