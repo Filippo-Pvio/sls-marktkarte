@@ -41,6 +41,8 @@ export default async function handler(req,res){
         lat:g.lat,lon:g.lon
       };
     }).filter(Boolean);
+    res.setHeader('X-SLS-Reference-Count',String(references.length));
+    if(req.query.summary==='1') return res.status(200).json({count:references.length,cities:[...new Set(references.map(r=>r.city))].slice(0,20)});
     return res.status(200).json({references});
   }catch(e){
     return res.status(503).json({error:'references_unavailable',references:[]});
