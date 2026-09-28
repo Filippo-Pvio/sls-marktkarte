@@ -311,13 +311,17 @@
     .reference-toggle i{width:8px;height:8px;border-radius:50%;background:#c75b50;display:grid;place-items:center;color:#fff;font:800 8px/1 system-ui,sans-serif;transition:all .2s ease}
     .reference-toggle.is-active{background:#315b69;color:#fff;border-color:#315b69;box-shadow:0 8px 24px rgba(29,69,82,.22)}
     .reference-toggle.is-active i{width:14px;height:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.7)}
-    .reference-toggle.is-active i::after{content:'✓';font-size:9px}
+    .reference-toggle.is-active i::after{content:'★';font-size:9px}
     .reference-toggle.attention i{animation:referencePulse .72s ease-in-out 3}
     @keyframes referencePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,91,80,.42)}50%{transform:scale(1.22);box-shadow:0 0 0 7px rgba(199,91,80,0)}}
     @media(prefers-reduced-motion:reduce){.reference-toggle.attention i{animation:none}}
-    .reference-pin{width:28px;height:28px;border-radius:50%;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 12px/1 system-ui,sans-serif}
-    .reference-cluster{min-width:34px;height:34px;padding:0 8px;border-radius:18px;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 11px/1 system-ui,sans-serif}
-    .reference-popup{width:220px;font-family:system-ui,sans-serif}.reference-popup img{display:block;width:100%;height:112px;object-fit:cover;border-radius:9px;margin-bottom:9px}.reference-popup .tag{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#66828c}.reference-popup strong{display:block;font:700 14px/1.25 Georgia,serif;color:#17262b;margin:4px 0 5px}.reference-popup p{margin:0 0 9px;font-size:11px;color:#657076}.reference-popup a{display:block;text-align:center;text-decoration:none;background:#294c59;color:white;border-radius:8px;padding:9px;font-size:11px;font-weight:800}
+    .reference-pin{width:30px;height:30px;border-radius:50%;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 14px/1 system-ui,sans-serif}
+    .reference-popup{width:220px;font-family:system-ui,sans-serif;background:#315b69;color:#fff;border-radius:12px;overflow:hidden;padding-bottom:12px}.reference-popup img{display:block;width:100%;height:112px;object-fit:cover;margin:0 0 10px}.reference-popup .tag{display:block;padding:0 12px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#dfecef}.reference-popup strong{display:block;padding:0 12px;font:700 14px/1.25 Georgia,serif;color:#fff;margin:4px 0 5px}.reference-popup p{margin:0 0 9px;padding:0 12px;font-size:11px;color:#e6eef1}.reference-popup a{display:block;margin:10px 12px 0;text-align:center;text-decoration:none;background:#fff9f3;color:#315b69;border-radius:8px;padding:9px;font-size:11px;font-weight:800}
+    .leaflet-popup-content-wrapper:has(.reference-popup){background:#315b69;color:#fff;border-radius:12px;padding:0;box-shadow:0 12px 30px rgba(11,17,18,.22)}
+    .leaflet-popup-content:has(.reference-popup){margin:0}
+    .leaflet-popup-tip-container:has(+ *){filter:none}
+    .leaflet-popup:has(.reference-popup) .leaflet-popup-tip{background:#315b69}
+    .leaflet-popup:has(.reference-popup) .leaflet-popup-close-button{color:#fff!important;z-index:2}
     @media(max-width:760px){.reference-toggle{top:auto;bottom:66px;right:12px;padding:9px 11px;font-size:10px}.reference-popup{width:200px}}
 
 </style>
@@ -763,7 +767,7 @@ try{
 }catch{}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function refIcon(count=1){
-  return L.divIcon({className:'',html:count>1?'<div class="reference-cluster">'+count+'</div>':'<div class="reference-pin">✓</div>',iconSize:count>1?[40,34]:[28,28],iconAnchor:count>1?[20,17]:[14,14]});
+  return L.divIcon({className:'',html:'<div class="reference-pin">★</div>',iconSize:[30,30],iconAnchor:[15,15]});
 }
 function renderReferences(){
   referenceLayer.clearLayers();
