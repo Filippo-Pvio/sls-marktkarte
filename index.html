@@ -304,11 +304,13 @@
       .region-pin strong{font-size:9.7px!important}
     }
 
+
+    @media(max-width:760px){.source-seg button{font-size:8.2px!important;padding-left:3px!important;padding-right:3px!important}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="market-header"><div class="header-inner"><div class="brand-row"><div class="title"><span class="header-eyebrow">SLS IMMOBILIENMARKT</span><strong>Marktpreise in Ihrer Region</strong><span class="header-meta">Angebotsindikation · Stand September 2026</span></div></div><div class="filters"><div class="seg compact-seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg compact-seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Spanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg compact-seg source-seg" aria-label="Datenebene"><button id="snapshotLayerBtn" class="active">Markt</button><button id="slsLayerBtn">SLS</button></div></div></div></header>
+  <header class="market-header"><div class="header-inner"><div class="brand-row"><div class="title"><span class="header-eyebrow">SLS IMMOBILIENMARKT</span><strong>Marktpreise in Ihrer Region</strong><span class="header-meta">Angebotsindikation · Stand September 2026</span></div></div><div class="filters"><div class="seg compact-seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg compact-seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Spanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg compact-seg source-seg" aria-label="Datenebene"><button id="snapshotLayerBtn" class="active">Angebotsmarkt</button><button id="slsLayerBtn">SLS-Daten</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
     <div class="map-tools">
@@ -320,8 +322,8 @@
       <nav id="crumbs" class="crumbs" aria-label="Kartennavigation"></nav>
     </div>
     <section class="intro-card" id="intro"><button class="intro-toggle" id="introToggle" aria-label="Hinweis ein- oder ausklappen">−</button><div class="eyebrow">Immobilienmarkt NRW</div><h1>Was kostet eine Immobilie in Ihrer Region?</h1><p>Stadt oder PLZ suchen und aktuelle Angebotswerte mit unserer SLS-Markterfahrung vergleichen.</p><div class="legend"><i></i><span>Preisangaben nur bei ausreichender Datenbasis.</span></div></section>
-    <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong>Sep. 2026</strong></div></div><div class="quality" id="panelQuality"><b>Datenbasis:</b> –</div><button class="cta" id="cta">Immobilie kostenlos bewerten</button><div class="fine" id="panelFine">Angebotsindikation · Stand September 2026 · kein Verkehrswert.</div></div></aside>
-    <div class="demo"><strong>TESTVERSION</strong>Angebots-Snapshot · Sep. 2026</div>
+    <aside class="panel" id="panel" aria-live="polite"><div class="panel-head"><button class="panel-close" id="panelClose" aria-label="Schließen">×</button><div class="panel-kicker" id="panelKicker">Teilmarkt</div><div class="panel-title" id="panelTitle">–</div></div><div class="panel-body"><div class="metric"><div><div class="label">Marktspanne</div><div class="value" id="panelPrice">–</div></div><div class="type" id="panelType">Eigentumswohnung<br>Bestand</div></div><div class="row"><div class="stat"><span>Typischer Wert</span><strong id="panelTypical">–</strong></div><div class="stat"><span>Datenstand</span><strong id="panelDate">Sep. 2026</strong></div></div><div class="quality" id="panelQuality"><b>Datenbasis:</b> –</div><button class="cta" id="cta">Immobilie kostenlos bewerten</button><div class="fine" id="panelFine">Angebotsindikation · Stand September 2026 · kein Verkehrswert.</div></div></aside>
+    <div class="demo"><strong>PROTOTYP</strong>Marktdaten werden quellengetrennt dargestellt.</div>
   </main>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -433,15 +435,33 @@ async function warmSlsData(data){
   await Promise.all(data.map(d=>loadSlsDatum(d)));
   if(dataSource==='sls') renderForView();
 }
+const phCache=new Map();
+function phKey(d){return String(d.plz||'')+'|'+currentType}
+function phDatum(d){return phCache.get(phKey(d))||null}
+async function loadPhDatum(d){
+  if(!d?.plz || d.marketScope==='city') return null;
+  const key=phKey(d);
+  if(phCache.has(key)) return phCache.get(key);
+  try{
+    const r=await fetch('/api/pricehubble-market?zip='+encodeURIComponent(d.plz)+'&type='+encodeURIComponent(currentType));
+    const x=await r.json();
+    const value=x&&x.found?{
+      range:[Number(x.low),Number(x.high)],
+      typ:Number(x.typical),
+      n:Number(x.count)||0,
+      provider:'pricehubble',
+      period:x.period||null
+    }:null;
+    phCache.set(key,value);
+    return value;
+  }catch(e){phCache.set(key,null);return null}
+}
+async function warmMarketData(data){
+  await Promise.all(data.map(d=>loadPhDatum(d)));
+  if(dataSource==='snapshot') renderForView();
+}
 
 
-const detailMarkets={
-'Dorsten':[{name:'Wulfen',lat:51.720,lon:7.020,wohnung:[2300,2850],haus:[2600,3400],typW:2570,typH:2980},{name:'Hervest',lat:51.683,lon:6.983,wohnung:[2150,2700],haus:[2500,3250],typW:2440,typH:2860},{name:'Holsterhausen',lat:51.674,lon:6.944,wohnung:[2350,2950],haus:[2700,3500],typW:2640,typH:3060},{name:'Altstadt',lat:51.661,lon:6.965,wohnung:[2550,3200],haus:[2850,3700],typW:2870,typH:3260},{name:'Rhade',lat:51.754,lon:6.944,wohnung:[2250,2800],haus:[2650,3500],typW:2510,typH:3050}],
-'Recklinghausen':[{name:'Hochlar',lat:51.619,lon:7.174,wohnung:[2600,3150],haus:[3000,3900],typW:2860,typH:3440},{name:'Suderwich',lat:51.610,lon:7.270,wohnung:[2350,2850],haus:[2650,3450],typW:2570,typH:3010},{name:'Nordviertel',lat:51.625,lon:7.197,wohnung:[2750,3350],haus:[3150,4100],typW:3040,typH:3640},{name:'Süd',lat:51.586,lon:7.210,wohnung:[2200,2750],haus:[2550,3300],typW:2480,typH:2890}],
-'Essen':[{name:'Rüttenscheid',lat:51.434,lon:7.006,wohnung:[3600,4700],haus:[4200,5600],typW:4100,typH:4880},{name:'Bredeney',lat:51.407,lon:7.005,wohnung:[3900,5200],haus:[4700,6500],typW:4520,typH:5580},{name:'Borbeck',lat:51.474,lon:6.950,wohnung:[2250,2950],haus:[2700,3600],typW:2580,typH:3120},{name:'Steele',lat:51.449,lon:7.077,wohnung:[2350,3050],haus:[2750,3700],typW:2690,typH:3230}],
-'Bochum':[{name:'Wiemelhausen',lat:51.457,lon:7.235,wohnung:[2750,3450],haus:[3200,4300],typW:3080,typH:3740},{name:'Stiepel',lat:51.429,lon:7.229,wohnung:[3050,3900],haus:[3600,4850],typW:3470,typH:4210},{name:'Wattenscheid',lat:51.481,lon:7.133,wohnung:[2100,2800],haus:[2500,3400],typW:2460,typH:2960}],
-'Dortmund':[{name:'Kreuzviertel',lat:51.504,lon:7.448,wohnung:[3300,4200],haus:[3900,5200],typW:3720,typH:4520},{name:'Hombruch',lat:51.475,lon:7.443,wohnung:[2750,3500],haus:[3250,4300],typW:3110,typH:3760},{name:'Aplerbeck',lat:51.489,lon:7.555,wohnung:[2500,3250],haus:[3000,3950],typW:2860,typH:3480}]
-};
 const NRW_BOUNDS=L.latLngBounds([[50.35,5.90],[52.45,9.25]]);
 const regions=[
   {name:'Ruhrgebiet',lat:51.52,lon:7.10,zoom:9.60,cities:['Dorsten','Recklinghausen','Essen','Bochum','Dortmund','Herne','Schermbeck']},
@@ -500,7 +520,7 @@ const fmt=n=>new Intl.NumberFormat('de-DE').format(n)+' €/m²';
 function sourceDatum(d){
   if(dataSource==='snapshot'){
     if(d?.marketScope==='city') return cityOfferSnapshot[String(d.name||'')]?.[currentType]||null;
-    return offerSnapshot[String(d.plz||'')]?.[currentType]||null;
+    return phDatum(d)||offerSnapshot[String(d.plz||'')]?.[currentType]||null;
   }
   if(dataSource==='sls') return slsDatum(d);
   return null;
@@ -544,6 +564,10 @@ async function loadViewportLocations(){
       const max=z>=11?24:14;
       await Promise.all(data.slice(0,max).map(d=>loadSlsDatum(d)));
       if(seq!==viewportSeq) return;
+    }else if(dataSource==='snapshot'){
+      const max=z>=11?24:14;
+      await Promise.all(data.slice(0,max).map(d=>loadPhDatum(d)));
+      if(seq!==viewportSeq) return;
     }
     clearMarkers();renderLevel='viewport';
     const usable=data.filter(d=>sourceDatum(d));
@@ -580,6 +604,7 @@ function addSelectedLocation(){
     }
   }
   if(dataSource==='snapshot'){
+    if(!phCache.has(phKey(d))){warmMarketData([d]);return}
     const s=sourceDatum(d);
     if(s){
       const m=L.marker([d.lat,d.lon],{icon:markerIcon(d,true),riseOnHover:true}).addTo(map);
@@ -666,8 +691,8 @@ function addData(data,cityMode=false){
         activeCity=d;
         activeRegion=regions.find(r=>r.cities.includes(d.name))||activeRegion;
         updateCrumbs();
-        map.flyTo([d.lat,d.lon],detailMarkets[d.name]?12:11.4,{duration:.8});
-        if(detailMarkets[d.name]) setTimeout(()=>addData(detailMarkets[d.name],false),700);
+        map.flyTo([d.lat,d.lon],11.4,{duration:.8});
+        setTimeout(renderForView,700);
       }
       openPanel(d,cityMode?'Stadt':'Teilmarkt')
     });
@@ -684,16 +709,25 @@ function openPanel(d,kicker){
   document.getElementById('panelType').innerHTML=(currentType==='wohnung'?'Eigentumswohnung':'Einfamilienhaus')+'<br>Bestand';
   const s=sourceDatum(d);
   const q=document.getElementById('panelQuality'),fine=document.getElementById('panelFine');
+  const dateEl=document.getElementById('panelDate');
   if(dataSource==='snapshot'&&s){
     const level=s.n>=10?'gute Datenbasis':s.n>=5?'eingeschränkte Datenbasis':'zu geringe Datenbasis';
     q.innerHTML='<b>Datenbasis:</b> '+s.n+' passende Vergleichsangebote · '+level+'.';
-    fine.textContent=(d.marketScope==='city'?'Stadtweite Angebotsindikation':'PLZ-genaue Angebotsindikation')+' · Stand September 2026 · kein Verkehrswert. Einzelangebote werden hier nicht veröffentlicht.';
+    if(s.provider==='pricehubble'){
+      dateEl.textContent='letzte 12 Mon.';
+      fine.textContent='PLZ-genaue Angebotsstatistik über PriceHubble · kein Verkehrswert. Einzelangebote werden nicht veröffentlicht.';
+    }else{
+      dateEl.textContent='Sep. 2026';
+      fine.textContent=(d.marketScope==='city'?'Stadtweiter Markt-Snapshot':'PLZ-genauer Markt-Snapshot')+' · Stand September 2026 · kein Verkehrswert. Einzelangebote werden nicht veröffentlicht.';
+    }
   }else if(dataSource==='sls'&&s){
     const basis=s.basis==='sold'?'realisierte SLS-Verkaufspreise':'anonymisierte SLS-Angebots-/Vermarktungsdaten';
     q.innerHTML='<b>SLS Daten:</b> '+s.count+' nutzbare Fälle · '+basis+'.';
+    dateEl.textContent='laufend';
     fine.textContent='SLS-Marktindikation aus anonymisierten Propstack-Daten · Mindestbasis 5 Fälle · kein Verkehrswert.';
   }else{
     q.innerHTML='<b>Datenbasis:</b> Für diese Auswahl liegen nicht genügend Daten vor.';
+    dateEl.textContent='–';
     fine.textContent='Preise werden erst ab mindestens 5 nutzbaren Fällen angezeigt.';
   }
   document.getElementById('panel').classList.add('open');
@@ -711,14 +745,13 @@ function renderForView(){
     updateCrumbs();
     return;
   }
-  activeCity=null;
   scheduleViewportLocations();
   updateCrumbs();
 }
 function update(){renderForView()}
 function goNRW(){activeRegion=null;activeCity=null;activeLocation=null;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');setInitialView();setTimeout(renderForView,80)}
 function goRegion(r){activeRegion=r;activeCity=null;activeLocation=null;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');map.flyTo([r.lat,r.lon],r.zoom,{duration:.65});setTimeout(renderForView,600)}
-function goCity(city){activeLocation=null;activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],detailMarkets[city.name]?12:11.4,{duration:.7});setTimeout(renderForView,650)}
+function goCity(city){activeLocation=null;activeCity=city;activeRegion=regions.find(r=>r.cities.includes(city.name))||activeRegion;searchExpandedByUser=false;document.getElementById('panel').classList.remove('open');map.flyTo([city.lat,city.lon],11.4,{duration:.7});setTimeout(renderForView,650)}
 function updateCrumbs(){
   const el=document.getElementById('crumbs');
   mapTools.classList.toggle('city-mode',!!activeCity&&!searchExpandedByUser);
