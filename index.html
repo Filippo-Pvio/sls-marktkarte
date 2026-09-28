@@ -306,6 +306,14 @@
 
 
     @media(max-width:760px){.source-seg button{font-size:8.2px!important;padding-left:3px!important;padding-right:3px!important}}
+
+    .reference-toggle{position:absolute;right:14px;top:14px;z-index:750;border:1px solid rgba(28,48,56,.18);background:rgba(255,251,246,.96);box-shadow:0 8px 24px rgba(11,17,18,.12);border-radius:999px;padding:9px 13px;font:700 11px/1 system-ui,sans-serif;color:#334d57;display:flex;align-items:center;gap:7px;cursor:pointer}
+    .reference-toggle i{width:8px;height:8px;border-radius:50%;background:#66828c;display:block}.reference-toggle.off{opacity:.68}.reference-toggle.off i{background:#aaa}
+    .reference-pin{width:28px;height:28px;border-radius:50%;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 12px/1 system-ui,sans-serif}
+    .reference-cluster{min-width:34px;height:34px;padding:0 8px;border-radius:18px;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 11px/1 system-ui,sans-serif}
+    .reference-popup{width:220px;font-family:system-ui,sans-serif}.reference-popup img{display:block;width:100%;height:112px;object-fit:cover;border-radius:9px;margin-bottom:9px}.reference-popup .tag{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#66828c}.reference-popup strong{display:block;font:700 14px/1.25 Georgia,serif;color:#17262b;margin:4px 0 5px}.reference-popup p{margin:0 0 9px;font-size:11px;color:#657076}.reference-popup a{display:block;text-align:center;text-decoration:none;background:#294c59;color:white;border-radius:8px;padding:9px;font-size:11px;font-weight:800}
+    @media(max-width:760px){.reference-toggle{top:auto;bottom:66px;right:12px;padding:9px 11px;font-size:10px}.reference-popup{width:200px}}
+
 </style>
 </head>
 <body>
@@ -313,6 +321,7 @@
   <header class="market-header"><div class="header-inner"><div class="brand-row"><div class="title"><span class="header-eyebrow">SLS IMMOBILIENMARKT</span><strong>Marktpreise in Ihrer Region</strong><span class="header-meta">Angebotsindikation · Stand September 2026</span></div></div><div class="filters"><div class="seg compact-seg" aria-label="Objektart"><button class="active" data-type="wohnung">Wohnung</button><button data-type="haus">Haus</button></div><div class="seg compact-seg" aria-label="Darstellung"><button class="active" data-mode="spanne">Spanne</button><button data-mode="mittel">Typischer Wert</button></div><div class="seg compact-seg source-seg" aria-label="Datenebene"><button id="snapshotLayerBtn" class="active">Angebotsmarkt</button><button id="slsLayerBtn">SLS-Daten</button></div></div></div></header>
   <main class="main">
     <div id="map"></div>
+    <button id="referenceToggle" class="reference-toggle" aria-pressed="true"><i></i>SLS-Referenzen</button>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -735,6 +744,59 @@ function openPanel(d,kicker){
 }
 function nearestRegion(){const center=map.getCenter();return regions.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
 function nearestCity(){const center=map.getCenter();return cities.slice().sort((a,b)=>Math.hypot(a.lat-center.lat,a.lon-center.lng)-Math.hypot(b.lat-center.lat,b.lon-center.lng))[0]}
+
+const referenceLayer=L.layerGroup().addTo(map);
+let referencesVisible=true,soldReferences=[],referencesLoaded=false;
+const referenceToggle=document.getElementById('referenceToggle');
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function refIcon(count=1){
+  return L.divIcon({className:'',html:count>1?'<div class="reference-cluster">'+count+'</div>':'<div class="reference-pin">✓</div>',iconSize:count>1?[40,34]:[28,28],iconAnchor:count>1?[20,17]:[14,14]});
+}
+function renderReferences(){
+  referenceLayer.clearLayers();
+  if(!referencesVisible||!soldReferences.length)return;
+  const z=map.getZoom();
+  const groups=new Map();
+  soldReferences.forEach(r=>{
+    if(!map.getBounds().pad(.15).contains([r.lat,r.lon]))return;
+    const key=z<10.7?r.city:(r.zipCode||r.city);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(r);
+  });
+  for(const items of groups.values()){
+    const first=items[0],count=items.length;
+    const lat=items.reduce((s,x)=>s+x.lat,0)/count,lon=items.reduce((s,x)=>s+x.lon,0)/count;
+    const m=L.marker([lat,lon],{icon:refIcon(count),zIndexOffset:300}).addTo(referenceLayer);
+    if(count>1&&z<10.7){
+      m.bindTooltip(count+' SLS-Referenzen · '+first.city,{direction:'top',offset:[0,-12]});
+      m.on('click',()=>map.flyTo([lat,lon],11.2,{duration:.65}));
+    }else{
+      const r=first;
+      const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
+      m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true});
+    }
+  }
+}
+async function loadReferences(){
+  if(referencesLoaded)return;
+  referencesLoaded=true;
+  try{
+    const r=await fetch('/api/sold-references');
+    const x=await r.json();
+    soldReferences=Array.isArray(x.references)?x.references.filter(v=>Number.isFinite(v.lat)&&Number.isFinite(v.lon)):[];
+    renderReferences();
+  }catch(e){}
+}
+referenceToggle.onclick=()=>{
+  referencesVisible=!referencesVisible;
+  referenceToggle.classList.toggle('off',!referencesVisible);
+  referenceToggle.setAttribute('aria-pressed',String(referencesVisible));
+  if(referencesVisible)referenceLayer.addTo(map);else referenceLayer.remove();
+  if(referencesVisible){loadReferences();renderReferences()}
+};
+map.on('moveend zoomend',renderReferences);
+setTimeout(loadReferences,300);
+
 function renderForView(){
   const z=map.getZoom();
   if(activeLocation&&z>=10.8){addSelectedLocation();updateCrumbs();return}
