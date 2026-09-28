@@ -776,6 +776,37 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function refIcon(){
   return L.divIcon({className:'reference-hit',html:'<div class="reference-pin">★</div>',iconSize:[58,58],iconAnchor:[29,29]});
 }
+
+function positionReferencePopup(marker){
+  const popup=marker.getPopup();
+  if(!popup)return;
+  requestAnimationFrame(()=>{
+    const el=popup._container;
+    const mapEl=map.getContainer();
+    if(!el||!mapEl)return;
+    const pr=el.getBoundingClientRect();
+    const mr=mapEl.getBoundingClientRect();
+    const mobile=window.matchMedia('(max-width:760px)').matches;
+    if(mobile){
+      const targetX=mr.left+mr.width/2;
+      const targetY=mr.top+mr.height*0.48;
+      const currentX=pr.left+pr.width/2;
+      const currentY=pr.top+pr.height/2;
+      const dx=currentX-targetX;
+      const dy=currentY-targetY;
+      if(Math.abs(dx)>2||Math.abs(dy)>2) map.panBy([dx,dy],{animate:true,duration:.25});
+    }else{
+      const pad=24;
+      let dx=0,dy=0;
+      if(pr.left<mr.left+pad) dx=pr.left-(mr.left+pad);
+      else if(pr.right>mr.right-pad) dx=pr.right-(mr.right-pad);
+      if(pr.top<mr.top+pad) dy=pr.top-(mr.top+pad);
+      else if(pr.bottom>mr.bottom-pad) dy=pr.bottom-(mr.bottom-pad);
+      if(dx||dy) map.panBy([dx,dy],{animate:true,duration:.25});
+    }
+  });
+}
+
 function renderReferences(){
   referenceLayer.clearLayers();
   if(!referencesVisible||!soldReferences.length)return;
@@ -798,12 +829,14 @@ function renderReferences(){
       L.DomEvent.disableClickPropagation(el);
     });
     const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
-    m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true,autoPan:true,autoPanPadding:[24,24]});
+    m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true,autoPan:false,keepInView:false});
     m.bindTooltip('SLS-Referenz · '+r.city,{direction:'top',offset:[0,-14]});
     m.on('click',e=>{
       if(e.originalEvent)L.DomEvent.stop(e.originalEvent);
       m.openPopup();
+      positionReferencePopup(m);
     });
+    m.on('popupopen',()=>positionReferencePopup(m));
   }
 }
 async function loadReferences(){
