@@ -307,10 +307,9 @@
 
     @media(max-width:760px){.source-seg button{font-size:8.2px!important;padding-left:3px!important;padding-right:3px!important}}
 
-    .reference-note{position:absolute;right:14px;top:58px;z-index:749;width:min(290px,calc(100% - 28px));padding:12px 14px;border-radius:12px;background:#315b69;color:#fff;box-shadow:0 10px 28px rgba(11,17,18,.2);font:400 11px/1.45 system-ui,sans-serif;opacity:0;visibility:hidden;transform:translateY(-5px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
+    .reference-note{position:absolute;right:14px;top:58px;z-index:749;width:min(270px,calc(100% - 28px));padding:9px 11px;border-radius:10px;background:#315b69;color:#fff;box-shadow:0 8px 22px rgba(11,17,18,.18);font:500 10px/1.35 system-ui,sans-serif;opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
     .reference-note.show{opacity:1;visibility:visible;transform:translateY(0)}
-    .reference-note strong{display:block;margin-bottom:3px;font-size:11px;color:#fff}
-    @media(max-width:760px){.reference-note{top:auto;right:12px;bottom:108px;width:min(286px,calc(100% - 24px))}}
+    @media(max-width:760px){.reference-note{top:auto;right:12px;bottom:108px;width:min(246px,calc(100% - 24px));padding:8px 10px;font-size:9.5px;line-height:1.35}}
     .reference-toggle{position:absolute;right:14px;top:14px;z-index:750;border:1px solid rgba(28,48,56,.18);background:rgba(255,251,246,.96);box-shadow:0 8px 24px rgba(11,17,18,.12);border-radius:999px;padding:9px 13px;font:700 11px/1 system-ui,sans-serif;color:#334d57;display:flex;align-items:center;gap:7px;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease}
     .reference-toggle i{width:8px;height:8px;border-radius:50%;background:#c75b50;display:grid;place-items:center;color:#fff;font:800 8px/1 system-ui,sans-serif;transition:all .2s ease}
     .reference-toggle.is-active{background:#315b69;color:#fff;border-color:#315b69;box-shadow:0 8px 24px rgba(29,69,82,.22)}
@@ -319,7 +318,7 @@
     .reference-toggle.attention i{animation:referencePulse .72s ease-in-out 3}
     @keyframes referencePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,91,80,.42)}50%{transform:scale(1.22);box-shadow:0 0 0 7px rgba(199,91,80,0)}}
     @media(prefers-reduced-motion:reduce){.reference-toggle.attention i{animation:none}}
-    .reference-hit{width:44px!important;height:44px!important;display:grid!important;place-items:center!important;background:transparent!important;border:0!important;touch-action:manipulation}
+    .reference-hit{width:58px!important;height:58px!important;display:grid!important;place-items:center!important;background:transparent!important;border:0!important;touch-action:manipulation}
     .reference-pin{width:30px;height:30px;border-radius:50%;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 14px/1 system-ui,sans-serif}
     .reference-popup{width:220px;font-family:system-ui,sans-serif;background:#315b69;color:#fff;border-radius:12px;overflow:hidden;padding-bottom:12px}.reference-popup img{display:block;width:100%;height:112px;object-fit:cover;margin:0 0 10px}.reference-popup .tag{display:block;padding:0 12px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#dfecef}.reference-popup strong{display:block;padding:0 12px;font:700 14px/1.25 Georgia,serif;color:#fff;margin:4px 0 5px}.reference-popup p{margin:0 0 9px;padding:0 12px;font-size:11px;color:#e6eef1}.reference-popup a{display:block;margin:10px 12px 0;text-align:center;text-decoration:none;background:#fff9f3;color:#315b69;border-radius:8px;padding:9px;font-size:11px;font-weight:800}
     .leaflet-popup-content-wrapper:has(.reference-popup){background:#315b69;color:#fff;border-radius:12px;padding:0;box-shadow:0 12px 30px rgba(11,17,18,.22)}
@@ -337,7 +336,7 @@
   <main class="main">
     <div id="map"></div>
     <button id="referenceToggle" class="reference-toggle" aria-pressed="false"><i></i>SLS-Referenzen</button>
-    <div id="referenceNote" class="reference-note" role="status" aria-live="polite"><strong>★ Ausgewählte SLS-Referenzen</strong>Hier sehen Sie eine Auswahl erfolgreich vermarkteter Immobilien. Aus Gründen der Übersichtlichkeit werden nicht alle Verkäufe dargestellt.</div>
+    <div id="referenceNote" class="reference-note" role="status" aria-live="polite">Es wird nur eine Auswahl erfolgreich vermarkteter Immobilien angezeigt. Nicht alle Verkäufe sind auf der Karte dargestellt.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -765,6 +764,7 @@ const referenceLayer=L.layerGroup().addTo(map);
 let referencesVisible=false,soldReferences=[],referencesLoaded=false;
 const referenceToggle=document.getElementById('referenceToggle');
 const referenceNote=document.getElementById('referenceNote');
+let referenceNoteTimer=0;
 try{
   if(!sessionStorage.getItem('sls.references.hint')){
     sessionStorage.setItem('sls.references.hint','1');
@@ -774,7 +774,7 @@ try{
 }catch{}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function refIcon(){
-  return L.divIcon({className:'reference-hit',html:'<div class="reference-pin">★</div>',iconSize:[44,44],iconAnchor:[22,22]});
+  return L.divIcon({className:'reference-hit',html:'<div class="reference-pin">★</div>',iconSize:[58,58],iconAnchor:[29,29]});
 }
 function renderReferences(){
   referenceLayer.clearLayers();
@@ -791,7 +791,15 @@ function renderReferences(){
     const first=items[0],count=items.length;
     const lat=items.reduce((s,x)=>s+x.lat,0)/count,lon=items.reduce((s,x)=>s+x.lon,0)/count;
     const r=first;
-    const m=L.marker([lat,lon],{icon:refIcon(),zIndexOffset:600,bubblingMouseEvents:false}).addTo(referenceLayer);
+    const m=L.marker([lat,lon],{icon:refIcon(),zIndexOffset:700,bubblingMouseEvents:false,keyboard:true}).addTo(referenceLayer);
+    m.on('add',()=>{
+      const el=m.getElement();
+      if(!el)return;
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+      el.addEventListener('touchstart',ev=>ev.stopPropagation(),{passive:true});
+      el.addEventListener('pointerdown',ev=>ev.stopPropagation());
+    });
     const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
     m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true,autoPan:true,autoPanPadding:[24,24]});
     m.bindTooltip('SLS-Referenz · '+r.city,{direction:'top',offset:[0,-14]});
@@ -827,7 +835,11 @@ referenceToggle.onclick=()=>{
   referenceToggle.classList.remove('attention');
   referenceToggle.classList.toggle('is-active',referencesVisible);
   referenceToggle.setAttribute('aria-pressed',String(referencesVisible));
+  clearTimeout(referenceNoteTimer);
   referenceNote.classList.toggle('show',referencesVisible);
+  if(referencesVisible){
+    referenceNoteTimer=setTimeout(()=>referenceNote.classList.remove('show'),6000);
+  }
   setReferenceZoomMode(referencesVisible);
   if(referencesVisible)referenceLayer.addTo(map);else referenceLayer.remove();
   if(referencesVisible){loadReferences();renderReferences()}
