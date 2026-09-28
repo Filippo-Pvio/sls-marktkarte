@@ -315,6 +315,7 @@
     .reference-toggle.attention i{animation:referencePulse .72s ease-in-out 3}
     @keyframes referencePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,91,80,.42)}50%{transform:scale(1.22);box-shadow:0 0 0 7px rgba(199,91,80,0)}}
     @media(prefers-reduced-motion:reduce){.reference-toggle.attention i{animation:none}}
+    .reference-hit{width:44px!important;height:44px!important;display:grid!important;place-items:center!important;background:transparent!important;border:0!important;touch-action:manipulation}
     .reference-pin{width:30px;height:30px;border-radius:50%;background:#5d7d88;border:2px solid #fff9f3;box-shadow:0 5px 14px rgba(11,17,18,.25);display:grid;place-items:center;color:white;font:800 14px/1 system-ui,sans-serif}
     .reference-popup{width:220px;font-family:system-ui,sans-serif;background:#315b69;color:#fff;border-radius:12px;overflow:hidden;padding-bottom:12px}.reference-popup img{display:block;width:100%;height:112px;object-fit:cover;margin:0 0 10px}.reference-popup .tag{display:block;padding:0 12px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#dfecef}.reference-popup strong{display:block;padding:0 12px;font:700 14px/1.25 Georgia,serif;color:#fff;margin:4px 0 5px}.reference-popup p{margin:0 0 9px;padding:0 12px;font-size:11px;color:#e6eef1}.reference-popup a{display:block;margin:10px 12px 0;text-align:center;text-decoration:none;background:#fff9f3;color:#315b69;border-radius:8px;padding:9px;font-size:11px;font-weight:800}
     .leaflet-popup-content-wrapper:has(.reference-popup){background:#315b69;color:#fff;border-radius:12px;padding:0;box-shadow:0 12px 30px rgba(11,17,18,.22)}
@@ -766,8 +767,8 @@ try{
   }
 }catch{}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function refIcon(count=1){
-  return L.divIcon({className:'',html:'<div class="reference-pin">★</div>',iconSize:[30,30],iconAnchor:[15,15]});
+function refIcon(){
+  return L.divIcon({className:'reference-hit',html:'<div class="reference-pin">★</div>',iconSize:[44,44],iconAnchor:[22,22]});
 }
 function renderReferences(){
   referenceLayer.clearLayers();
@@ -783,15 +784,15 @@ function renderReferences(){
   for(const items of groups.values()){
     const first=items[0],count=items.length;
     const lat=items.reduce((s,x)=>s+x.lat,0)/count,lon=items.reduce((s,x)=>s+x.lon,0)/count;
-    const m=L.marker([lat,lon],{icon:refIcon(count),zIndexOffset:300}).addTo(referenceLayer);
-    if(count>1&&z<10.7){
-      m.bindTooltip(count+' SLS-Referenzen · '+first.city,{direction:'top',offset:[0,-12]});
-      m.on('click',()=>map.flyTo([lat,lon],11.2,{duration:.65}));
-    }else{
-      const r=first;
-      const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
-      m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true});
-    }
+    const r=first;
+    const m=L.marker([lat,lon],{icon:refIcon(),zIndexOffset:600,bubblingMouseEvents:false}).addTo(referenceLayer);
+    const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
+    m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true,autoPan:true,autoPanPadding:[24,24]});
+    m.bindTooltip('SLS-Referenz · '+r.city,{direction:'top',offset:[0,-14]});
+    m.on('click',e=>{
+      if(e.originalEvent)L.DomEvent.stop(e.originalEvent);
+      m.openPopup();
+    });
   }
 }
 async function loadReferences(){
@@ -804,11 +805,23 @@ async function loadReferences(){
     renderReferences();
   }catch(e){}
 }
+function setReferenceZoomMode(active){
+  const handlers=['doubleClickZoom','scrollWheelZoom','touchZoom','boxZoom'];
+  handlers.forEach(name=>{
+    const h=map[name];
+    if(!h)return;
+    if(active)h.disable();else h.enable();
+  });
+  if(map.tap){
+    if(active)map.tap.disable();else map.tap.enable();
+  }
+}
 referenceToggle.onclick=()=>{
   referencesVisible=!referencesVisible;
   referenceToggle.classList.remove('attention');
   referenceToggle.classList.toggle('is-active',referencesVisible);
   referenceToggle.setAttribute('aria-pressed',String(referencesVisible));
+  setReferenceZoomMode(referencesVisible);
   if(referencesVisible)referenceLayer.addTo(map);else referenceLayer.remove();
   if(referencesVisible){loadReferences();renderReferences()}
 };
