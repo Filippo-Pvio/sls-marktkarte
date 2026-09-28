@@ -840,7 +840,7 @@ referenceToggle.onclick=()=>{
   if(referencesVisible)referenceLayer.addTo(map);else referenceLayer.remove();
   if(referencesVisible){loadReferences();renderReferences()}
 };
-map.on('moveend zoomend',renderReferences);
+map.on('dragend zoomend',renderReferences);
 /* Referenzen werden erst nach bewusster Aktivierung geladen. */
 
 function renderForView(){
