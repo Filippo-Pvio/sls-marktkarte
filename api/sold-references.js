@@ -27,10 +27,12 @@ export default async function handler(req,res){
       if(!places.has(key))places.set(key,{city:item.city,zipCode:item.zipCode||null});
     }
     const coords=new Map();
-    for(const [key,p] of places){
-      const g=await geocode(p.city,p.zipCode);
-      if(g)coords.set(key,g);
-    }
+    await Promise.all([...places].map(async ([key,p])=>{
+      try{
+        const g=await geocode(p.city,p.zipCode);
+        if(g)coords.set(key,g);
+      }catch{}
+    }));
     const references=refs.map(item=>{
       const key=(item.zipCode||'')+'|'+item.city,g=coords.get(key);
       if(!g)return null;
