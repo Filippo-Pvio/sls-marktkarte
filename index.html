@@ -307,6 +307,10 @@
 
     @media(max-width:760px){.source-seg button{font-size:8.2px!important;padding-left:3px!important;padding-right:3px!important}}
 
+    .reference-note{position:absolute;right:14px;top:58px;z-index:749;width:min(290px,calc(100% - 28px));padding:12px 14px;border-radius:12px;background:#315b69;color:#fff;box-shadow:0 10px 28px rgba(11,17,18,.2);font:400 11px/1.45 system-ui,sans-serif;opacity:0;visibility:hidden;transform:translateY(-5px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
+    .reference-note.show{opacity:1;visibility:visible;transform:translateY(0)}
+    .reference-note strong{display:block;margin-bottom:3px;font-size:11px;color:#fff}
+    @media(max-width:760px){.reference-note{top:auto;right:12px;bottom:108px;width:min(286px,calc(100% - 24px))}}
     .reference-toggle{position:absolute;right:14px;top:14px;z-index:750;border:1px solid rgba(28,48,56,.18);background:rgba(255,251,246,.96);box-shadow:0 8px 24px rgba(11,17,18,.12);border-radius:999px;padding:9px 13px;font:700 11px/1 system-ui,sans-serif;color:#334d57;display:flex;align-items:center;gap:7px;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease}
     .reference-toggle i{width:8px;height:8px;border-radius:50%;background:#c75b50;display:grid;place-items:center;color:#fff;font:800 8px/1 system-ui,sans-serif;transition:all .2s ease}
     .reference-toggle.is-active{background:#315b69;color:#fff;border-color:#315b69;box-shadow:0 8px 24px rgba(29,69,82,.22)}
@@ -333,6 +337,7 @@
   <main class="main">
     <div id="map"></div>
     <button id="referenceToggle" class="reference-toggle" aria-pressed="false"><i></i>SLS-Referenzen</button>
+    <div id="referenceNote" class="reference-note" role="status" aria-live="polite"><strong>★ Ausgewählte SLS-Referenzen</strong>Hier sehen Sie eine Auswahl erfolgreich vermarkteter Immobilien. Aus Gründen der Übersichtlichkeit werden nicht alle Verkäufe dargestellt.</div>
     <div class="map-tools">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -759,6 +764,7 @@ function nearestCity(){const center=map.getCenter();return cities.slice().sort((
 const referenceLayer=L.layerGroup().addTo(map);
 let referencesVisible=false,soldReferences=[],referencesLoaded=false;
 const referenceToggle=document.getElementById('referenceToggle');
+const referenceNote=document.getElementById('referenceNote');
 try{
   if(!sessionStorage.getItem('sls.references.hint')){
     sessionStorage.setItem('sls.references.hint','1');
@@ -821,6 +827,7 @@ referenceToggle.onclick=()=>{
   referenceToggle.classList.remove('attention');
   referenceToggle.classList.toggle('is-active',referencesVisible);
   referenceToggle.setAttribute('aria-pressed',String(referencesVisible));
+  referenceNote.classList.toggle('show',referencesVisible);
   setReferenceZoomMode(referencesVisible);
   if(referencesVisible)referenceLayer.addTo(map);else referenceLayer.remove();
   if(referencesVisible){loadReferences();renderReferences()}
