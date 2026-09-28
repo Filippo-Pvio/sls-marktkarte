@@ -796,9 +796,6 @@ function renderReferences(){
       const el=m.getElement();
       if(!el)return;
       L.DomEvent.disableClickPropagation(el);
-      L.DomEvent.disableScrollPropagation(el);
-      el.addEventListener('touchstart',ev=>ev.stopPropagation(),{passive:true});
-      el.addEventListener('pointerdown',ev=>ev.stopPropagation());
     });
     const link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Referenz ansehen</a>':'';
     m.bindPopup('<div class="reference-popup"><img src="'+esc(r.image)+'" alt="Verkaufte Immobilie in '+esc(r.city)+'" loading="lazy"><span class="tag">Erfolgreich vermarktet</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.type)+' · '+esc(r.city)+(r.zipCode?' · '+esc(r.zipCode):'')+'</p>'+link+'</div>',{maxWidth:240,closeButton:true,autoPan:true,autoPanPadding:[24,24]});
@@ -820,15 +817,14 @@ async function loadReferences(){
   }catch(e){}
 }
 function setReferenceZoomMode(active){
-  const handlers=['doubleClickZoom','scrollWheelZoom','touchZoom','boxZoom'];
-  handlers.forEach(name=>{
-    const h=map[name];
-    if(!h)return;
-    if(active)h.disable();else h.enable();
-  });
-  if(map.tap){
-    if(active)map.tap.disable();else map.tap.enable();
+  if(map.doubleClickZoom){
+    if(active) map.doubleClickZoom.disable();
+    else map.doubleClickZoom.enable();
   }
+  if(map.touchZoom) map.touchZoom.enable();
+  if(map.scrollWheelZoom) map.scrollWheelZoom.enable();
+  if(map.boxZoom) map.boxZoom.enable();
+  if(map.dragging) map.dragging.enable();
 }
 referenceToggle.onclick=()=>{
   referencesVisible=!referencesVisible;
